@@ -1,0 +1,86 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+    android:background="@drawable/background"
+    android:theme="@android:style/Theme.NoTitleBar">
+
+    <ImageView
+        android:layout_width="@dimen/main_mascot_width"
+        android:layout_height="@dimen/main_mascot_height"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/mascot" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/open_pic_layout"
+        >
+
+        <ImageView
+            android:layout_width="@dimen/main_1_btn_size"
+            android:layout_height="@dimen/main_1_btn_size"
+            android:id="@+id/btn_camera"
+            android:src="@drawable/btn_camera_open"/>
+        <ImageView
+            android:layout_width="@dimen/main_1_btn_size"
+            android:layout_height="@dimen/main_1_btn_size"
+            android:id="@+id/btn_gallery"
+            android:src="@drawable/btn_gallery_open"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/composer_wrapper_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/open_pic_layout"
+        android:layout_centerHorizontal="true">
+        <ImageView
+            android:id="@+id/btn_composer_face_match"
+            android:layout_width="@dimen/main_2_btn_size"
+            android:layout_height="@dimen/main_2_btn_size"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/btn_face_match"
+            android:visibility="invisible"/>
+        <ImageView
+            android:id="@+id/btn_composer_age_test"
+            android:layout_width="@dimen/main_2_btn_size"
+            android:layout_height="@dimen/main_2_btn_size"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/btn_age_test"
+            android:visibility="invisible"/>
+        <ImageView
+            android:id="@+id/btn_composer_text_conversion"
+            android:layout_width="@dimen/main_2_btn_size"
+            android:layout_height="@dimen/main_2_btn_size"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/btn_text_conversion"
+            android:visibility="invisible"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/open_pic_layout"
+        android:layout_centerHorizontal="true">
+        <ImageView
+            android:id="@+id/btn_composer_button"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/more"
+            />
+        <ImageView
+            android:id="@+id/btn_composer_button_icon"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/icn_plus"
+            />
+    </RelativeLayout>
+</RelativeLayout>
