@@ -32,8 +32,8 @@ public class HorizontalListViewAdapter extends BaseAdapter{
     private Context mContext;
     private LayoutInflater mInflater;
     private Vector<Integer> imageStatus;
-    Bitmap iconBitmap;
-    Bitmap faceBitmap;
+    Bitmap iconBitmap = null;
+    Bitmap faceBitmap = null;
     private int selectIndex = -1;
     private final int LEFT_FACE_IMAGE_VIEW = 1;
     private final int RIGHT_FACE_IMAGE_VIEW = 2;
@@ -113,10 +113,7 @@ public class HorizontalListViewAdapter extends BaseAdapter{
         int w = mContext.getResources().getDimensionPixelOffset(R.dimen.thumnail_default_width);
         int h = mContext.getResources().getDimensionPixelSize(R.dimen.thumnail_default_height);
 
-        // OPTIONS_RECYCLE_INPUT指示回收b的内存
-        Bitmap thumBitmap = ThumbnailUtils.extractThumbnail(b, w, h,ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
-
-        return thumBitmap;
+        return ThumbnailUtils.extractThumbnail(b, w, h,ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
     }
     public void setSelectIndex(int i){
         selectIndex = i;
