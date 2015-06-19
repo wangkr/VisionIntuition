@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/VisionSDKClientLib/VisionSDKClientLib.iml" filepath="$PROJECT_DIR$/VisionSDKClientLib/VisionSDKClientLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/Vision_Recognition.iml" filepath="$PROJECT_DIR$/Vision_Recognition.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

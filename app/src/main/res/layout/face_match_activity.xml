@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:circleprogress="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".FaceMatActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/fact_match_ActPaddingTop"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="@color/fm_activity_background_color">
+    android:background="@color/activity_background_color">
     <!-- 相似度显示-->
     <RelativeLayout
         android:id="@+id/similarity_layout"
@@ -93,17 +95,55 @@
 
     </RelativeLayout>
 
+    <!-- 选择图片、头像匹配按钮布局-->
+    <RelativeLayout
+        android:id="@+id/select_image_button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/fm_select_image_btn_height"
+        android:layout_below="@id/face_match_image_layout"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true">
+        <Button
+            android:id="@+id/fm_select_image_lbtn"
+            android:layout_width="@dimen/select_image_button_width"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_select_image"
+            android:text="@string/btn_select_image_text"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:onClick="onSelectLImage"/>
+        <Button
+            android:id="@+id/face_match_btn"
+            android:layout_width="@dimen/select_image_button_width"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_select_image"
+            android:text="@string/btn_face_match_text"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:layout_centerHorizontal="true"/>
+        <Button
+            android:id="@+id/fm_select_image_rbtn"
+            android:layout_width="@dimen/select_image_button_width"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_select_image"
+            android:text="@string/btn_select_image_text"
+            android:textSize="15sp"
+            android:textColor="@android:color/white"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:onClick="onSelectRImage"/>
+    </RelativeLayout>
     <!-- 头像画廊——水平ListView-->
     <RelativeLayout
         android:id="@+id/facepic_horizontalView_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/facepic_hListView_height"
-        android:layout_below="@id/face_match_image_layout"
-        android:paddingLeft="@dimen/hListView_hPadding"
-        android:paddingRight="@dimen/hListView_hPadding"
-        android:paddingBottom="@dimen/hListView_vPadding"
-        android:paddingTop="@dimen/hListView_vPadding"
-        android:layout_marginTop="20dp">
+        android:layout_below="@id/select_image_button_layout"
+        android:layout_marginTop="10dp">
+        <!-- 相框布局-->
+
         <!-- hListView 背景-->
         <ImageView
             android:layout_width="match_parent"
@@ -116,14 +156,19 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true">
         </com.kairong.horizonListView.HorizontalListView>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/hlist_gallery_frame_height"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/hlist_gallery_up_gradient_shape"
+            />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/hlist_gallery_frame_height"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/hlist_gallery_down_gradient_shape"
+            />
     </RelativeLayout>
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/facepic_hListView_height"
-        android:background="@drawable/hori_list_gallery_rect"
-        android:layout_below="@id/face_match_image_layout"
-        android:layout_marginTop="20dp"
-        android:focusable="false"/>
     <!-- 文字对话布局-->
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -135,7 +180,7 @@
             android:id="@+id/face_match_mascot"
             android:layout_width="@dimen/secondary_mascot_size"
             android:layout_height="@dimen/secondary_mascot_size"
-            android:background="@drawable/mascot_1"/>
+            android:background="@drawable/octopus"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

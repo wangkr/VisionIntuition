@@ -2,6 +2,7 @@ package com.kairong.vision_recognition;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -33,6 +34,7 @@ import com.kairong.horizonListView.HorizontalListView;
 import com.kairong.horizonListView.HorizontalListViewAdapter;
 import com.kairong.viAlertDialog.viAlertDialog;
 import com.kairong.viUtils.BitmapUtil;
+import com.kairong.viUtils.CameraUtil;
 import com.kairong.viUtils.DisplayUtil;
 import com.kairong.viUtils.viSize;
 
@@ -71,6 +73,8 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
     private int touchClickPosition = -1;
     private boolean hasLeftFaceImage = false;
     private boolean hasRightFaceImage = false;
+    private Bitmap leftImage = null;
+    private Bitmap rightImage = null;
     private final String TAG = "FaceMatActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,69 +103,32 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
         hListView.setAdapter(hListViewAdapter);
         hListView.setOnItemClickListener(onItemClickListener_hList);
         hListView.setOnItemLongClickListener(onItemLongClickListener_hList);
-        findViewById(R.id.left_face_image_layout).setOnClickListener(onClickListener_ImageView);
-        findViewById(R.id.right_face_image_layout).setOnClickListener(onClickListener_ImageView);
+        findViewById(R.id.left_face_image_layout).setOnLongClickListener(onLongClickListener_LayoutView);
+        findViewById(R.id.right_face_image_layout).setOnLongClickListener(onLongClickListener_LayoutView);
     }
 
-    private View.OnClickListener onClickListener_ImageView = new View.OnClickListener() {
+    private View.OnLongClickListener onLongClickListener_LayoutView = new View.OnLongClickListener() {
         @Override
-        public void onClick(View v) {
-            String dlTitleString = "";
-            // 获取点击的view位置
-            if(v.getId() == R.id.left_face_image_layout) {
-                touchClickPosition = LEFT_FACE_IMAGE_VIEW;
-                if(hasLeftFaceImage){ // 根据图片内容有无设置dialog标题
-                    dlTitleString = "替换图片";
-                }else{
-                    dlTitleString = "获取照片";
-                }
-            }else{
-                touchClickPosition = RIGHT_FACE_IMAGE_VIEW;
-                if(hasRightFaceImage){// 根据图片内容有无设置dialog标题
-                    dlTitleString = "替换图片";
-                }else{
-                    dlTitleString = "获取照片";
-                }
-            }
-
-            // 初始化viAlertDialog
-            final Dialog dialog = new viAlertDialog(FaceMatActivity.this, R.style.viAlertDialog,dlTitleString);
-            dialog.show();
-            dialog.findViewById(R.id.btn_aldl_camera).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent imgIntent = new Intent(FaceMatActivity.this, viCameraActivity.class);
-                    imgIntent.putExtra("SrcTag", TAG);
-                    startActivityForResult(imgIntent, CAMERA_TOUCH_IMAGE_CODE);
-                    dialog.cancel();
-                }
-            });
-            dialog.findViewById(R.id.btn_aldl_gallery).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_PICK);
-                    intent.setType("image/*");//相片类型
-                    startActivityForResult(intent, GALLERY_TOUCH_IMAGE_CODE);
-                    dialog.cancel();
-                }
-            });
+        public boolean onLongClick(View v) {
+            onLongClickToOpenCam(v);
+            return false;
         }
     };
 
     private AdapterView.OnItemLongClickListener onItemLongClickListener_hList = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            if (imagePathsList.size() > 0) {
-                int[] location = new int[2];
+            if (imagePathsList.size() != position) {
                 // 获取当前view在当前屏幕的绝对坐标位置
                 // location[0]表示view的x坐标值,location[1]表示view的y坐标值
+                int[] location = new int[2];
                 view.getLocationOnScreen(location);
                 longClickPosition = position;
                 DisplayMetrics displayMetrics = new DisplayMetrics();
                 Display display = FaceMatActivity.this.getWindowManager().getDefaultDisplay();
                 display.getMetrics(displayMetrics);
                 WindowManager.LayoutParams layoutParams = viHintDialog.getWindow().getAttributes();
-                layoutParams.gravity = Gravity.BOTTOM|Gravity.LEFT;
+                layoutParams.gravity = Gravity.BOTTOM|Gravity.START;
                 layoutParams.y = display.getHeight() - location[1];
                 layoutParams.x = location[0];
                 viHintDialog.getWindow().setAttributes(layoutParams);
@@ -180,190 +147,62 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
                 // 初始化viAlertDialog
                 final Dialog dialog = new viAlertDialog(FaceMatActivity.this, R.style.viAlertDialog,"获取照片");
                 dialog.show();
-                dialog.findViewById(R.id.btn_aldl_camera).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent imgIntent = new Intent(FaceMatActivity.this, viCameraActivity.class);
-                        imgIntent.putExtra("SrcTag", TAG);
-                        startActivityForResult(imgIntent, CAMERA_IMAGE_CODE);
-                        dialog.cancel();
-                    }
-                });
-                dialog.findViewById(R.id.btn_aldl_gallery).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(Intent.ACTION_PICK);
-                        intent.setType("image/*");//相片类型
-                        startActivityForResult(intent, GALLERY_IMAGE_CODE);
-                        dialog.cancel();
-                    }
-                });
+                ((viAlertDialog)dialog).init(FaceMatActivity.this, CAMERA_IMAGE_CODE, GALLERY_IMAGE_CODE, TAG);
             }else if(position < imagePathsList.size()){
-                if(imageStatus.get(position)!=NONE_FACE_IMAGE){
-                    // 设置背景透明
-                    view.setBackgroundColor(Color.TRANSPARENT);
-                    eraseFaceImageView(imageStatus.get(position));
-                    imageStatus.set(position,NONE_FACE_IMAGE);
-                }else if(!hasLeftFaceImage){// 如果没有左边的头像，则显示
-                    imageStatus.set(position,LEFT_FACE_IMAGE_VIEW);
-                    // 设置背景为left faceimage背景色
-                    view.setBackgroundColor(getResources().getColor(R.color.hList_left_face_item_bk_color));
-                    setFaceImage(imagePathsList.get(position), LEFT_FACE_IMAGE_VIEW);
-                    hasLeftFaceImage = true;
-                }else if(!hasRightFaceImage){
-                    imageStatus.set(position,RIGHT_FACE_IMAGE_VIEW);
-                    // 设置背景为right faceimage背景色
-                    view.setBackgroundColor(getResources().getColor(R.color.hList_right_face_item_bk_color));
-                    setFaceImage(imagePathsList.get(position), RIGHT_FACE_IMAGE_VIEW);
-                    hasRightFaceImage = true;
-                }
-
+                updatehListView(position,view);
             }
         }
     };
 
+    private void onLongClickToOpenCam(View view){
+        switch (view.getId()){
+            case R.id.left_face_image_layout:
+                touchClickPosition = LEFT_FACE_IMAGE_VIEW;
+                break;
+            case R.id.right_face_image_layout:
+                touchClickPosition = RIGHT_FACE_IMAGE_VIEW;
+                break;
+        }
+        Intent imgIntent = new Intent(FaceMatActivity.this, viCameraActivity.class);
+        imgIntent.putExtra("SrcTag", TAG);
+        startActivityForResult(imgIntent, CAMERA_TOUCH_IMAGE_CODE);
+    }
+    public void onSelectLImage(View view){
+        String dlTitleString = "";
+        touchClickPosition = LEFT_FACE_IMAGE_VIEW;
+        if(hasLeftFaceImage){ dlTitleString = "替换图片";}
+        else{ dlTitleString = "获取照片";}
+        // 初始化viAlertDialog
+        final Dialog dialog = new viAlertDialog(FaceMatActivity.this, R.style.viAlertDialog,dlTitleString);
+        dialog.show();
+        ((viAlertDialog)dialog).init(FaceMatActivity.this,CAMERA_TOUCH_IMAGE_CODE,GALLERY_TOUCH_IMAGE_CODE,TAG);
+    }
+    public void onSelectRImage(View view){
+        String dlTitleString = "";
+        touchClickPosition = RIGHT_FACE_IMAGE_VIEW;
+        if(hasRightFaceImage){ dlTitleString = "替换图片";}
+        else{ dlTitleString = "获取照片";}
+        // 初始化viAlertDialog
+        final Dialog dialog = new viAlertDialog(FaceMatActivity.this, R.style.viAlertDialog,dlTitleString);
+        dialog.show();
+        ((viAlertDialog)dialog).init(FaceMatActivity.this,CAMERA_TOUCH_IMAGE_CODE,GALLERY_TOUCH_IMAGE_CODE,TAG);
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode!=RESULT_OK){
             Toast.makeText(FaceMatActivity.this,"没有获取任何图片",Toast.LENGTH_SHORT).show();
             return;
+        }else{
+            updateFaceImageView(requestCode,data);
         }
-        switch (requestCode){
-            case CAMERA_IMAGE_CODE:// 从相机添加图片
-                String filepath = data.getStringExtra("imagepath");
-                imagePathsList.add(filepath);
-                imageStatus.add(NONE_FACE_IMAGE);
-                hListViewAdapter.notifyDataSetChanged();
-                break;
-            case GALLERY_IMAGE_CODE:// 从相册获取图片
-                Uri uri = data.getData();
-                String[] proj = {MediaStore.Images.Media.DATA};
-                Cursor cursor = managedQuery(uri,proj,null,null,null);
-                // 获得图片索引值
-                int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                // 将光标移至开头
-                cursor.moveToFirst();
-                // 最后根据索引值获取图片路径
-                String filepath2 = cursor.getString(index);
-                // 判断图像大小是否超过最大值，超过则不加载
-                if(BitmapUtil.getImageSizeBeforeLoad(filepath2)>BitmapUtil.IMAGE_MAX_LOAD_SIZE){
-                    Toast.makeText(this,"图片尺寸过大!",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                imagePathsList.add(filepath2);
-                imageStatus.add(NONE_FACE_IMAGE);
-                hListViewAdapter.notifyDataSetChanged();
-                break;
-            case CAMERA_REPLACE_IMAGE_CODE:// 从相机获取替换的图片
-                String filepath3 = data.getStringExtra("imagepath");
-                imagePathsList.set(longClickPosition,filepath3);
-                hListViewAdapter.notifyDataSetChanged();
-                setFaceImage(filepath3,imageStatus.get(longClickPosition));
-                break;
-            case GALLERY_REPLACE_IMAGE_CODE:// 从相册获取替换的图片
-                Uri uri1 = data.getData();
-                String[] proj1 = {MediaStore.Images.Media.DATA};
-                Cursor cursor1 = managedQuery(uri1,proj1,null,null,null);
-                // 获得图片索引值
-                int index1 = cursor1.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                // 将光标移至开头
-                cursor1.moveToFirst();
-                // 最后根据索引值获取图片路径
-                String filepath4 = cursor1.getString(index1);
-                // 判断图像大小是否超过最大值，超过则不加载
-                if(BitmapUtil.getImageSizeBeforeLoad(filepath4)>BitmapUtil.IMAGE_MAX_LOAD_SIZE){
-                    Toast.makeText(this,"图片尺寸过大",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                imagePathsList.set(longClickPosition,filepath4);
-                hListViewAdapter.notifyDataSetChanged();
-                setFaceImage(filepath4, imageStatus.get(longClickPosition));
-                break;
-            case CAMERA_TOUCH_IMAGE_CODE: // 触摸添加/替换头像图片：相机方式
-                String filepath5 = data.getStringExtra("imagepath");
-                // 如果face image view上之前有图片，则替换图片，否则添加。
-                if(touchClickPosition == LEFT_FACE_IMAGE_VIEW) {
-                    if(hasLeftFaceImage) {
-                        imagePathsList.set(imageStatus.indexOf(LEFT_FACE_IMAGE_VIEW), filepath5);
-                    }else{
-                        imagePathsList.add(filepath5);
-                        imageStatus.add(touchClickPosition);
-                        hasLeftFaceImage = true;
-                    }
-                }else if(touchClickPosition == RIGHT_FACE_IMAGE_VIEW){
-                    if(hasRightFaceImage){
-                        imagePathsList.set(imageStatus.indexOf(RIGHT_FACE_IMAGE_VIEW), filepath5);
-                    }else{
-                        imagePathsList.add(filepath5);
-                        imageStatus.add(touchClickPosition);
-                        hasRightFaceImage = true;
-                    }
-                }
-                setFaceImage(filepath5,touchClickPosition);
-                hListViewAdapter.notifyDataSetChanged();
-                break;
-            case GALLERY_TOUCH_IMAGE_CODE:// 触摸添加/替换头像图片：相册方式
-                Uri uri2 = data.getData();
-                String[] proj2 = {MediaStore.Images.Media.DATA};
-                Cursor cursor2 = managedQuery(uri2,proj2,null,null,null);
-                // 获得图片索引值
-                int index2 = cursor2.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                // 将光标移至开头
-                cursor2.moveToFirst();
-                // 最后根据索引值获取图片路径
-                String filepath6 = cursor2.getString(index2);
-                // 判断图像大小是否超过最大值，超过则不加载
-                if(BitmapUtil.getImageSizeBeforeLoad(filepath6)>BitmapUtil.IMAGE_MAX_LOAD_SIZE){
-                    Toast.makeText(this,"图片尺寸过大",Toast.LENGTH_SHORT).show();
-                    touchClickPosition = NONE_FACE_IMAGE;
-                    return;
-                }
-                // 如果face image view上之前有图片，则替换图片，否则添加。
-                if(touchClickPosition == LEFT_FACE_IMAGE_VIEW) {
-                    if(hasLeftFaceImage) {
-                        imagePathsList.set(imageStatus.indexOf(LEFT_FACE_IMAGE_VIEW), filepath6);
-                    }else{
-                        imagePathsList.add(filepath6);
-                        imageStatus.add(touchClickPosition);
-                        hasLeftFaceImage = true;
-                    }
-                }else if(touchClickPosition == RIGHT_FACE_IMAGE_VIEW){
-                    if(hasRightFaceImage){
-                        imagePathsList.set(imageStatus.indexOf(RIGHT_FACE_IMAGE_VIEW), filepath6);
-                    }else{
-                        imagePathsList.add(filepath6);
-                        imageStatus.add(touchClickPosition);
-                        hasRightFaceImage = true;
-                    }
-                }
-                setFaceImage(filepath6,touchClickPosition);
-                hListViewAdapter.notifyDataSetChanged();
-                break;
-        }
+
     }
 
     @Override
     public void leftOnclick() {
         final Dialog dialog = new viAlertDialog(FaceMatActivity.this,R.style.viAlertDialog,"替换照片");
         dialog.show();
-        dialog.findViewById(R.id.btn_aldl_camera).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent imgIntent = new Intent(FaceMatActivity.this, viCameraActivity.class);
-                imgIntent.putExtra("SrcTag", TAG);
-                startActivityForResult(imgIntent, CAMERA_REPLACE_IMAGE_CODE);
-                dialog.cancel();
-            }
-        });
-        dialog.findViewById(R.id.btn_aldl_gallery).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");//相片类型
-                startActivityForResult(intent, GALLERY_REPLACE_IMAGE_CODE);
-                dialog.cancel();
-            }
-        });
+        ((viAlertDialog)dialog).init(FaceMatActivity.this, CAMERA_REPLACE_IMAGE_CODE, GALLERY_REPLACE_IMAGE_CODE, TAG);
         viHintDialog.cancel();
     }
 
@@ -379,20 +218,155 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
     }
 
     /**
+     * 更新horizontal List View 图片
+     * @param position
+     * @param view
+     */
+    public void updatehListView(int position, View view) {
+        if (imageStatus.get(position) != NONE_FACE_IMAGE) {
+            // 设置背景透明
+            view.setBackgroundColor(Color.TRANSPARENT);
+            eraseFaceImageView(imageStatus.get(position));
+            imageStatus.set(position, NONE_FACE_IMAGE);
+        } else if (!hasLeftFaceImage) {// 如果没有左边的头像，则显示
+            imageStatus.set(position, LEFT_FACE_IMAGE_VIEW);
+            // 设置背景为left faceimage背景色
+            view.setBackgroundColor(getResources().getColor(R.color.hList_left_face_item_bk_color));
+            setFaceImageView(imagePathsList.get(position), LEFT_FACE_IMAGE_VIEW);
+            hasLeftFaceImage = true;
+        } else if (!hasRightFaceImage) {
+            imageStatus.set(position, RIGHT_FACE_IMAGE_VIEW);
+            // 设置背景为right faceimage背景色
+            view.setBackgroundColor(getResources().getColor(R.color.hList_right_face_item_bk_color));
+            setFaceImageView(imagePathsList.get(position), RIGHT_FACE_IMAGE_VIEW);
+            hasRightFaceImage = true;
+        }
+    }
+
+    /**
+     * 更新Face Image View图片
+     * @param requestCode
+     * @param data
+     */
+    private void updateFaceImageView(int requestCode,Intent data){
+        String filepath = null;
+        switch (requestCode){
+            case CAMERA_IMAGE_CODE:// 从相机添加图片
+                filepath = data.getStringExtra("imagepath");
+                imagePathsList.add(filepath);
+                imageStatus.add(NONE_FACE_IMAGE);
+                hListViewAdapter.notifyDataSetChanged();
+                break;
+            case GALLERY_IMAGE_CODE:// 从相册获取图片
+                filepath = CameraUtil.getImageFromSysGallery(this,data);
+                // 判断图像大小是否超过最大值，超过则不加载
+                if(BitmapUtil.getImageSizeBeforeLoad(filepath)>BitmapUtil.IMAGE_MAX_LOAD_SIZE){
+                    Toast.makeText(this,"图片尺寸过大!",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                imagePathsList.add(filepath);
+                imageStatus.add(NONE_FACE_IMAGE);
+                hListViewAdapter.notifyDataSetChanged();
+                break;
+            case CAMERA_REPLACE_IMAGE_CODE:// 从相机获取替换的图片
+                filepath = data.getStringExtra("imagepath");
+                imagePathsList.set(longClickPosition,filepath);
+                hListViewAdapter.notifyDataSetChanged();
+                setFaceImageView(filepath,imageStatus.get(longClickPosition));
+                break;
+            case GALLERY_REPLACE_IMAGE_CODE:// 从相册获取替换的图片
+                filepath = CameraUtil.getImageFromSysGallery(this,data);
+                // 判断图像大小是否超过最大值，超过则不加载
+                if(BitmapUtil.getImageSizeBeforeLoad(filepath)>BitmapUtil.IMAGE_MAX_LOAD_SIZE){
+                    Toast.makeText(this,"图片尺寸过大",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                imagePathsList.set(longClickPosition,filepath);
+                hListViewAdapter.notifyDataSetChanged();
+                setFaceImageView(filepath, imageStatus.get(longClickPosition));
+                break;
+            case CAMERA_TOUCH_IMAGE_CODE: // 触摸"添加/替换"头像图片：相机方式
+                filepath = data.getStringExtra("imagepath");
+                // 如果face image view上之前有图片，则替换图片，否则添加。
+                if(touchClickPosition == LEFT_FACE_IMAGE_VIEW) {
+                    if(hasLeftFaceImage) {
+                        imagePathsList.set(imageStatus.indexOf(LEFT_FACE_IMAGE_VIEW), filepath);
+                    }else{
+                        imagePathsList.add(filepath);
+                        imageStatus.add(touchClickPosition);
+                        hasLeftFaceImage = true;
+                    }
+                }else if(touchClickPosition == RIGHT_FACE_IMAGE_VIEW){
+                    if(hasRightFaceImage){
+                        imagePathsList.set(imageStatus.indexOf(RIGHT_FACE_IMAGE_VIEW), filepath);
+                    }else{
+                        imagePathsList.add(filepath);
+                        imageStatus.add(touchClickPosition);
+                        hasRightFaceImage = true;
+                    }
+                }
+                setFaceImageView(filepath,touchClickPosition);
+                hListViewAdapter.notifyDataSetChanged();
+                break;
+            case GALLERY_TOUCH_IMAGE_CODE:// 触摸"添加/替换"头像图片：相册方式
+                filepath = CameraUtil.getImageFromSysGallery(this,data);
+                // 判断图像大小是否超过最大值，超过则不加载
+                if(BitmapUtil.getImageSizeBeforeLoad(filepath)>BitmapUtil.IMAGE_MAX_LOAD_SIZE){
+                    Toast.makeText(this,"图片尺寸过大",Toast.LENGTH_SHORT).show();
+                    touchClickPosition = NONE_FACE_IMAGE;
+                    return;
+                }
+                // 如果face image view上之前有图片，则替换图片，否则添加。
+                if(touchClickPosition == LEFT_FACE_IMAGE_VIEW) {
+                    if(hasLeftFaceImage) {
+                        imagePathsList.set(imageStatus.indexOf(LEFT_FACE_IMAGE_VIEW), filepath);
+                    }else{
+                        imagePathsList.add(filepath);
+                        imageStatus.add(touchClickPosition);
+                        hasLeftFaceImage = true;
+                    }
+                }else if(touchClickPosition == RIGHT_FACE_IMAGE_VIEW){
+                    if(hasRightFaceImage){
+                        imagePathsList.set(imageStatus.indexOf(RIGHT_FACE_IMAGE_VIEW), filepath);
+                    }else{
+                        imagePathsList.add(filepath);
+                        imageStatus.add(touchClickPosition);
+                        hasRightFaceImage = true;
+                    }
+                }
+                setFaceImageView(filepath,touchClickPosition);
+                hListViewAdapter.notifyDataSetChanged();
+                break;
+        }
+    }
+    /**
      * 设置人脸图片View
      * @param filepath：图片路径
      * @param showPosition：显示位置
      */
-    private void setFaceImage(String filepath,int showPosition){
+    private void setFaceImageView(String filepath,int showPosition){
         if(showPosition == NONE_FACE_IMAGE)
             return;
-        Bitmap facebitmap = BitmapUtil.decodeSampledBitmapFromFile(filepath,faceImageViewWidth,faceImageViewHeight);
         switch (showPosition){
             case LEFT_FACE_IMAGE_VIEW:
-                leftFaceView.setImageBitmap(facebitmap);
+                // 分配内存前回收内存
+                if(leftImage!=null&&!leftImage.isRecycled()){
+                    leftImage.recycle();
+                    leftImage = null;
+                }
+                leftImage = BitmapUtil.decodeSampledBitmapFromFile(filepath,faceImageViewWidth,faceImageViewHeight);
+                leftFaceView.setImageBitmap(leftImage);
+                leftFaceView.setVisibility(View.VISIBLE);
                 break;
             case RIGHT_FACE_IMAGE_VIEW:
-                rightFaceView.setImageBitmap(facebitmap);
+                // 分配内存前回收内存
+                if(rightImage!=null&&!rightImage.isRecycled()){
+                    rightImage.recycle();
+                    rightImage = null;
+                }
+                rightImage = BitmapUtil.decodeSampledBitmapFromFile(filepath,faceImageViewWidth,faceImageViewHeight);
+                rightFaceView.setImageBitmap(rightImage);
+                rightFaceView.setVisibility(View.VISIBLE);
                 break;
         }
 
@@ -405,14 +379,41 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
     private void eraseFaceImageView(int showPosition){
         switch (showPosition){
             case LEFT_FACE_IMAGE_VIEW:
-                leftFaceView.setImageBitmap(null);
+                leftFaceView.setVisibility(View.GONE);
                 hasLeftFaceImage = false;
+                // 回收内存
+                if(leftImage!=null&&!leftImage.isRecycled()){
+                    leftImage.recycle();
+                    leftImage = null;
+                }
                 break;
             case RIGHT_FACE_IMAGE_VIEW:
-                rightFaceView.setImageBitmap(null);
+                rightFaceView.setVisibility(View.GONE);
                 hasRightFaceImage = false;
+                if(rightImage!=null&&!rightImage.isRecycled()){
+                    rightImage.recycle();
+                    rightImage = null;
+                }
                 break;
         }
 
+    }
+    private void bitmapRecycle(){
+        // 回收bitmap内存
+        if(leftImage!=null&&!leftImage.isRecycled()){
+            leftImage.recycle();
+            leftImage = null;
+        }
+        if(rightImage!=null&&!rightImage.isRecycled()){
+            rightImage.recycle();
+            rightImage = null;
+        }
+        System.gc();
+    }
+
+    @Override
+    public void finish() {
+        bitmapRecycle();
+        super.finish();
     }
 }

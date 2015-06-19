@@ -44,10 +44,9 @@
             android:src="@drawable/btn_take_photo_camera_change"/>
         <ImageView
             android:id="@+id/btn_take_photo"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
+            android:layout_width="@dimen/shutter_btn_size"
+            android:layout_height="@dimen/shutter_btn_size"
+            android:layout_centerInParent="true"
             android:src="@drawable/btn_take_photo"/>
     </RelativeLayout>
     <!-- 预览照片时"存储”和“放弃”按钮布局-->
@@ -63,59 +62,29 @@
         android:visibility="invisible"
         >
 
-        <ImageView
+        <Button
             android:id="@+id/btn_take_photo_ok"
             android:layout_width="@dimen/photo_preview_ok_btn_Width"
             android:layout_height="@dimen/photo_preview_ok_btn_Heigth"
-            android:src="@drawable/btn_take_photo_ok"
+            android:background="@drawable/btn_take_photo_ok"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:text="@string/btn_take_photo_ok_text"
+            android:textColor="@android:color/white"
             />
-        <ImageView
+        <Button
             android:id="@+id/btn_take_photo_cancell"
             android:layout_width="@dimen/photo_preview_ok_btn_Width"
             android:layout_height="@dimen/photo_preview_ok_btn_Heigth"
-            android:src="@drawable/btn_take_photo_ok"
+            android:background="@drawable/btn_take_photo_ok"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:text="@string/btn_take_photo_cancell_text"
             />
-        <!-- 两个按钮的文字布局-->
-        <RelativeLayout
-            android:layout_width="@dimen/photo_preview_ok_btn_Width"
-            android:layout_height="@dimen/photo_preview_ok_btn_Heigth"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/btn_take_photo_ok_text"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/photo_preview_ok_btnTextSize"
-                android:layout_centerInParent="true"
-                />
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="@dimen/photo_preview_ok_btn_Width"
-            android:layout_height="@dimen/photo_preview_ok_btn_Heigth"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/btn_take_photo_cancell_text"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/photo_preview_ok_btnTextSize"
-                android:layout_centerInParent="true"
-                />
-        </RelativeLayout>
+
     </RelativeLayout>
 
 

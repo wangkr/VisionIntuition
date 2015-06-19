@@ -1,12 +1,16 @@
 package com.kairong.viAlertDialog;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.kairong.viCamera.viCameraActivity;
 import com.kairong.vision_recognition.R;
 
 /**
@@ -37,7 +41,7 @@ public class viAlertDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vi_alertdialog_activity);
-        ImageView cancell_button = (ImageView)findViewById(R.id.btn_aldl_cancell);
+        RelativeLayout cancell_button = (RelativeLayout)findViewById(R.id.aldl_clbtn_layout);
         ((TextView)findViewById(R.id.alertTitle)).setText(titleString);
         cancell_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +49,27 @@ public class viAlertDialog extends Dialog {
                 dismiss();
             }
         });
+    }
 
+    public void init(final Activity activity,final int requestCamCode,final int requestGalCode,final String tag){
+        findViewById(R.id.aldl_cmbtn_layout).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent imgIntent = new Intent(activity, viCameraActivity.class);
+                imgIntent.putExtra("SrcTag", tag);
+                activity.startActivityForResult(imgIntent, requestCamCode);
+                dismiss();
+            }
+        });
+        findViewById(R.id.aldl_glbtn_layout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");//相片类型
+                activity.startActivityForResult(intent, requestGalCode);
+                dismiss();
+            }
+        });
     }
 
 }

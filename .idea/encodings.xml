@@ -7,6 +7,7 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/myPathButton/myAnimations.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/sensorDetector/ScrnOrientDetector.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/sensorDetector/ShakeDetector.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/viAlertDialog/viAlertDialog.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/viAlertDialog/viHintDialog.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/viCamera/CamTargetList.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/viCamera/CmTargetClass.java" charset="UTF-8" />
@@ -20,6 +21,6 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/vision_recognition/MainActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/vision_recognition/TextCovtActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/kairong/vision_recognition/WelcomeActivity.java" charset="UTF-8" />
-    <file url="PROJECT" charset="GBK" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

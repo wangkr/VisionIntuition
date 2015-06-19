@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,24 +15,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kairong.circleButton.CircleButton;
 import com.kairong.viCamera.viCameraActivity;
 import com.kairong.myPathButton.myAnimations;
 import com.kairong.viUtils.BitmapUtil;
 
 
 public class MainActivity extends Activity {
-    private ImageView btn_camera = null;
-    private ImageView btn_gallery = null;
-    private RelativeLayout composerButtonWrapper = null;
     private ImageView composerButtonShowHideButtonIcon = null;
-    private ImageView composerButtonShowHideButton = null;
-    private ImageView btn_face_match = null;
-    private ImageView btn_age_test = null;
-    private ImageView btn_text_conversion = null;
+    private RelativeLayout composerButtonWrapper = null;
     private long exitTime = 0;
-    private static final int CAMERA_WITH_DATA = 3021;
     private static final int REQUEST_CODE_PICK_IMAGE = 3022;
     private myAnimations myanimation = null;
 
@@ -44,15 +40,18 @@ public class MainActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
-        btn_camera = (ImageView)findViewById(R.id.btn_camera);
-        btn_gallery = (ImageView)findViewById(R.id.btn_gallery);
-        btn_face_match = (ImageView)findViewById(R.id.btn_composer_face_match);
-        btn_age_test = (ImageView)findViewById(R.id.btn_composer_age_test);
-        btn_text_conversion = (ImageView)findViewById(R.id.btn_composer_text_conversion);
-        composerButtonShowHideButton = (ImageView)findViewById(R.id.btn_composer_button);
+        CircleButton btn_camera = (CircleButton)findViewById(R.id.btn_camera);
+        CircleButton btn_gallery = (CircleButton)findViewById(R.id.btn_gallery);
+        ImageView btn_face_match = (ImageView)findViewById(R.id.btn_composer_face_match);
+        ImageView btn_age_test = (ImageView)findViewById(R.id.btn_composer_age_test);
+        ImageView btn_text_conversion = (ImageView)findViewById(R.id.btn_composer_text_conversion);
+        ImageView composerButtonShowHideButton = (ImageView)findViewById(R.id.btn_composer_button);
+        TextView title_text = (TextView)findViewById(R.id.text_title);
         composerButtonShowHideButtonIcon = (ImageView)findViewById(R.id.btn_composer_button_icon);
         composerButtonWrapper = (RelativeLayout)findViewById(R.id.composer_wrapper_layout);
 
+        Typeface typeface = Typeface.createFromAsset(getAssets(),"fonts/SNAP ITC.TTF");
+        title_text.setTypeface(typeface);
         btn_face_match.setOnClickListener(cpBtnListener);
         btn_age_test.setOnClickListener(cpBtnListener);
         btn_text_conversion.setOnClickListener(cpBtnListener);
@@ -72,7 +71,7 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
             }
         });
-        myanimation = new myAnimations(composerButtonWrapper,myAnimations.CENTERTOP,300);
+        myanimation = new myAnimations(composerButtonWrapper,myAnimations.CENTERTOP,320);
         composerButtonShowHideButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -175,4 +174,5 @@ public class MainActivity extends Activity {
             android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
+
 }

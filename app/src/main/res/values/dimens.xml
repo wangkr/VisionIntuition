@@ -4,33 +4,44 @@
     <dimen name="activity_vertical_margin">15dp</dimen>
     <dimen name="activity_secondary_margin">6dp</dimen>
     <dimen name="activity_tertiary_margin">4dp</dimen>
+    <dimen name="select_image_button_width">80dp</dimen>
+    <dimen name="select_image_button_height">40dp</dimen>
+    <dimen name="select_image_layout_width">200dp</dimen>
     <dimen name="default_circle_view_size">200dp</dimen>
     <!-- MainActivity(activity_main)-->
-    <dimen name="main_mascot_width">200dp</dimen>
-    <dimen name="main_mascot_height">200dp</dimen>
+    <dimen name="main_mascot_width">240dp</dimen>
+    <dimen name="main_mascot_height">240dp</dimen>
+    <dimen name="open_pic_layout_width">180dp</dimen>
+    <dimen name="main_1_btn_LRpadding">7dp</dimen>
     <dimen name="main_1_btn_size">80dp</dimen>
-    <dimen name="main_2_btn_size">56dp</dimen>
+    <dimen name="main_2_btn_size">60dp</dimen>
     <!-- viCameraActivity(take_photo_activity)-->
     <dimen name="photo_preview_ok_btn_Width">64dp</dimen>
     <dimen name="photo_preview_ok_btn_Heigth">40dp</dimen>
     <dimen name="photo_preview_ok_btnTextSize">18sp</dimen>
     <dimen name="photo_preview_bar_height">64dp</dimen>
+    <dimen name="shutter_btn_size">56dp</dimen>
     <!-- Horizontal list view-->
-    <dimen name="image_item_padding">4dp</dimen>
+    <dimen name="image_item_hpadding">3dp</dimen>
+    <dimen name="image_item_vpadding">10dp</dimen>
     <dimen name="thumnail_default_width">60dp</dimen>
     <dimen name="thumnail_default_height">80dp</dimen>
+    <dimen name="hlist_gallery_frame_height">10dp</dimen>
     <!-- face_match_acvitity-->
     <dimen name="facepic_hListView_height">100dp</dimen>
     <dimen name="secondary_mascot_size">50dp</dimen>
     <dimen name="faceimage_parent_layout_height">270dp</dimen>
-    <dimen name="hListView_hPadding">8dp</dimen>
-    <dimen name="hListView_vPadding">6dp</dimen>
     <dimen name="fact_match_ActPaddingTop">4dp</dimen>
     <dimen name="circleProgress_view_size">90dp</dimen>
+    <dimen name="fm_select_image_btn_width">70dp</dimen>
+    <dimen name="fm_select_image_btn_height">30dp</dimen>
     <!-- age_test_activity-->
     <dimen name="at_imageview_height">270dp</dimen>
     <!-- text_conversion_activity-->
     <dimen name="tc_imageview_height">250dp</dimen>
+    <!-- auto recognition activity-->
+    <dimen name="at_select_image_btn_height">34dp</dimen>
+    <dimen name="at_image_layout_margin_bottom">10dp</dimen>
     <!-- vi_alertdialog_activity-->
     <dimen name="vi_alertDialog_bar_height">54dp</dimen>
     <dimen name="vi_btn_layout_height">210dp</dimen>
@@ -39,6 +50,11 @@
     <dimen name="vi_btn_height">46dp</dimen>
     <dimen name="vi_aldl_layout_width">300dp</dimen>
     <dimen name="vi_btn_top_margin">15dp</dimen>
+    <dimen name="vi_aldl_mascot_size">45dp</dimen>
+    <dimen name="vi_aldl_titletext_size">24sp</dimen>
+    <dimen name="vi_aldl_btnshape_corner_radias">15dp</dimen>
+    <dimen name="vi_aldl_btn_icn_width">48dp</dimen>
+    <dimen name="vi_aldl_btn_icn_height">36dp</dimen>
     <!-- hint_dialog_layout-->
     <dimen name="vi_hint_btn_size">32dp</dimen>
     <dimen name="vi_hint_text_size">10sp</dimen>

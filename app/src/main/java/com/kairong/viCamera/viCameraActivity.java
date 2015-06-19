@@ -3,7 +3,6 @@ package com.kairong.viCamera;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,7 +14,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -27,13 +25,12 @@ import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.kairong.sensorDetector.ScrnOrientDetector;
-import com.kairong.viUtils.DisplayUtil;
-import com.kairong.vision_recognition.FaceMatActivity;
 import com.kairong.vision_recognition.R;
 import com.kairong.sensorDetector.ShakeDetector;
 
@@ -44,20 +41,14 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Kairong on 2015/5/27.
+ * mail:wangkrhust@gmail.com
  */
 public class viCameraActivity extends Activity implements SurfaceHolder.Callback {
 
     private String TAG = "viCameraActivity";
-
-    private ImageView btn_gallery = null;           // 打开相册
-    private ImageView btn_camera_change = null;     // 切换相机
-    private ImageView btn_shutter = null;           // 快门
-    private ImageView btn_take_photo_ok = null;     // 存储照片
-    private ImageView btn_take_photo_cancell;       // 放弃存储
     private SurfaceView surface = null;
     private Camera camera = null;                   // 声明相机
     private int cameraPosition = 1;                 // 0代表前置摄像头，1代表后置摄像头
@@ -107,11 +98,11 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // 设置控件资源ID
-        btn_gallery = (ImageView)findViewById(R.id.btn_take_photo_gallery);
-        btn_camera_change = (ImageView)findViewById(R.id.btn_camera_change);
-        btn_shutter = (ImageView)findViewById(R.id.btn_take_photo);
-        btn_take_photo_ok = (ImageView)findViewById(R.id.btn_take_photo_ok);
-        btn_take_photo_cancell = (ImageView)findViewById(R.id.btn_take_photo_cancell);
+        ImageView btn_gallery = (ImageView)findViewById(R.id.btn_take_photo_gallery);
+        ImageView btn_camera_change = (ImageView)findViewById(R.id.btn_camera_change);
+        ImageView btn_shutter = (ImageView)findViewById(R.id.btn_take_photo);
+        Button btn_take_photo_ok = (Button)findViewById(R.id.btn_take_photo_ok);
+        Button btn_take_photo_cancell = (Button)findViewById(R.id.btn_take_photo_cancell);
         surface = (SurfaceView)findViewById(R.id.surfaceview);
         focus_View = (ImageView)findViewById(R.id.focus);
         holder = surface.getHolder();//获得句柄
@@ -404,7 +395,6 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
             saved_photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             bos.flush();    // 刷新此缓冲区的输出流
             bos.close();    // 关闭此输出流并释放与此流有关的所有系统资源
-            saved_photo.recycle();//回收bitmap空间
             // 跳转到其他的Activity
             if(resultClass!=null){
                 Intent newint = new Intent(viCameraActivity.this, resultClass);
@@ -415,6 +405,9 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                 newint.putExtra("imagepath", filepath);
                 startActivity(newint);
             }
+            saved_photo.recycle();//回收bitmap空间
+            saved_photo = null;
+            System.gc();
             this.finish();
         }catch (IOException e){
             e.printStackTrace();

@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:circleprogress="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".TextCovtActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="20dp"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="@color/tc_activity_background_color">
+    android:background="@color/activity_background_color">
     <RelativeLayout
         android:id="@+id/text_conversion_layout"
         android:layout_width="match_parent"
@@ -35,13 +37,38 @@
 
     </RelativeLayout>
 
+    <!-- 选择图片、头像匹配按钮布局-->
+    <RelativeLayout
+        android:id="@+id/tc_select_image_layout"
+        android:layout_width="@dimen/select_image_layout_width"
+        android:layout_height="@dimen/select_image_button_height"
+        android:layout_below="@id/text_conversion_layout"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true">
+        <Button
+            android:id="@+id/tc_select_image_btn"
+            android:layout_width="@dimen/select_image_button_width"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_select_image"
+            android:text="@string/btn_select_image_text"
+            android:textColor="@android:color/white"
+            android:onClick="onSelectImage"/>
+        <Button
+            android:id="@+id/text_conversion_btn"
+            android:layout_width="@dimen/select_image_button_width"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_select_image"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:text="@string/btn_text_conversion_text"
+            android:textColor="@android:color/white"/>
+    </RelativeLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_below="@id/text_conversion_layout"
-        android:layout_marginTop="30dp">
-
-
+        android:layout_below="@id/tc_select_image_layout"
+        android:layout_marginTop="20dp">
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -50,7 +77,7 @@
             android:id="@+id/text_conversion_editText"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:background="@color/semitransparent_color"/>
+            android:background="@android:color/white"/>
     </RelativeLayout>
 
 </RelativeLayout>

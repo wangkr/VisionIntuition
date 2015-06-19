@@ -10,12 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/vi_alertDialog_bar_height"
         android:background="@drawable/vi_alertdialogbar_bk"
+        android:paddingStart="@dimen/activity_secondary_margin"
         android:paddingLeft="@dimen/activity_secondary_margin"
+        android:paddingRight="@dimen/activity_secondary_margin"
         >
         <ImageView
-            android:layout_width="@dimen/secondary_mascot_size"
-            android:layout_height="@dimen/secondary_mascot_size"
-            android:background="@drawable/mascot_1"
+            android:layout_width="@dimen/vi_aldl_mascot_size"
+            android:layout_height="@dimen/vi_aldl_mascot_size"
+            android:background="@drawable/octopus"
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"/>
@@ -24,9 +26,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:textSize="25sp"
+            android:textSize="@dimen/vi_aldl_titletext_size"
             android:textColor="@android:color/white"
-            android:text="获取图片"/>
+            android:text=""/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -38,55 +40,43 @@
         android:paddingBottom="@dimen/vi_btn_layout_vPadding">
         <!-- camera button 布局-->
         <RelativeLayout
-            android:id="@+id/algl_cmbtn_layout"
+            android:id="@+id/aldl_cmbtn_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="@dimen/vi_btn_height"
+            android:background="@drawable/selector_vi_aldl_cmbtn">
             <ImageView
-                android:id="@+id/btn_aldl_camera"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/vi_btn_height"
-                android:src="@drawable/selector_vi_aldl_cmbtn"/>
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="36dp"
+                android:layout_width="@dimen/vi_aldl_btn_icn_width"
+                android:layout_height="@dimen/vi_aldl_btn_icn_height"
                 android:layout_centerInParent="true"
                 android:background="@drawable/alert_cmbtn_icn"
                 android:focusable="false"/>
         </RelativeLayout>
         <!-- gallery button 布局-->
         <RelativeLayout
-            android:id="@+id/algl_glbtn_layout"
+            android:id="@+id/aldl_glbtn_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/algl_cmbtn_layout"
-            android:layout_marginTop="@dimen/vi_btn_top_margin">
+            android:layout_height="@dimen/vi_btn_height"
+            android:layout_below="@id/aldl_cmbtn_layout"
+            android:layout_marginTop="@dimen/vi_btn_top_margin"
+            android:background="@drawable/selector_vi_aldl_glbtn">
             <ImageView
-                android:id="@+id/btn_aldl_gallery"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/vi_btn_height"
-                android:src="@drawable/selector_vi_aldl_glbtn"/>
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="36dp"
+                android:layout_width="@dimen/vi_aldl_btn_icn_width"
+                android:layout_height="@dimen/vi_aldl_btn_icn_height"
                 android:layout_centerInParent="true"
                 android:background="@drawable/alert_glbtn_icn"
                 android:focusable="false"/>
         </RelativeLayout>
         <!-- cancell button 布局-->
         <RelativeLayout
-            android:id="@+id/algl_clbtn_layout"
+            android:id="@+id/aldl_clbtn_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/algl_glbtn_layout"
-            android:layout_marginTop="@dimen/vi_btn_top_margin">
+            android:layout_height="@dimen/vi_btn_height"
+            android:layout_below="@id/aldl_glbtn_layout"
+            android:layout_marginTop="@dimen/vi_btn_top_margin"
+            android:background="@drawable/selector_vi_aldl_clbtn">
             <ImageView
-                android:id="@+id/btn_aldl_cancell"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/vi_btn_height"
-                android:src="@drawable/selector_vi_aldl_clbtn"/>
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="36dp"
+                android:layout_width="@dimen/vi_aldl_btn_icn_width"
+                android:layout_height="@dimen/vi_aldl_btn_icn_height"
                 android:layout_centerInParent="true"
                 android:background="@drawable/alert_clbtn_icn"
                 android:focusable="false"/>

@@ -1,7 +1,13 @@
 package com.kairong.viUtils;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +19,9 @@ import java.util.List;
  * mail:wangkrhust@gmail.com
  */
 public final class CameraUtil {
+    // 相机支持的预览尺寸列表
     private static List<Size> supportedPreviewSizes = null;
+    // 相机支持的图片尺寸列表
     private static List<Size> supportedPictureSizes = null;
 
     public static void init()
@@ -44,5 +52,24 @@ public final class CameraUtil {
             Collections.sort(supportedPictureSizes,comp);
             Collections.sort(supportedPreviewSizes,comp);
         }
+    }
+
+    /**
+     * 从系统相册获取图片，并返回图片路径
+     * @param activity：目标Activity
+     * @param data：相册数据
+     * @return
+     */
+    public static String getImageFromSysGallery(Activity activity,Intent data){
+        Uri uri = data.getData();
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = activity.managedQuery(uri, proj, null, null, null);
+        // 获得图片索引值
+        int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        // 将光标移至开头
+        cursor.moveToFirst();
+        // 最后根据索引值获取图片路径
+        String filepath = cursor.getString(index);
+        return filepath;
     }
 }

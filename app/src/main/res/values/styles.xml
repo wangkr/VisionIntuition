@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="viAlertDialog" parent="Theme.Dialog">
+    <style name="viAlertDialog" parent="@android:Theme.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@drawable/vi_alertdialog_bk</item>
@@ -13,7 +13,7 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style parent="Theme.Dialog" name="viHintDialog">
+    <style parent="@android:Theme.Dialog" name="viHintDialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

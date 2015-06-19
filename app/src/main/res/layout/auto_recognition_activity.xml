@@ -6,10 +6,35 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="@color/auto_activity_background_color"
-    tools:context="com.kairong.vision_recognition.ResultActivity">
+    android:background="@color/activity_background_color"
+    tools:context=".AutoRecgActivity">
 
-
+    <RelativeLayout
+        android:id="@+id/ar_select_image_button_layout"
+        android:layout_width="@dimen/select_image_layout_width"
+        android:layout_height="@dimen/at_select_image_btn_height"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
+        <Button
+            android:id="@+id/at_select_image_btn"
+            android:layout_width="@dimen/select_image_button_width"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_select_image"
+            android:text="@string/btn_select_image_text"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:onClick="onSelectImage"/>
+        <Button
+            android:id="@+id/ar_share_btn"
+            android:layout_width="@dimen/select_image_button_width"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_select_image"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:text="@string/btn_ar_share_text"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"/>
+    </RelativeLayout>
     <RelativeLayout
         android:id="@+id/auto_image_layout"
         android:layout_width="fill_parent"
@@ -18,7 +43,9 @@
         android:paddingLeft="@dimen/activity_secondary_margin"
         android:paddingTop="@dimen/activity_secondary_margin"
         android:paddingBottom="@dimen/activity_secondary_margin"
-        android:background="@color/semitransparent_color">
+        android:background="@color/semitransparent_color"
+        android:layout_above="@id/ar_select_image_button_layout"
+        android:layout_marginBottom="@dimen/at_image_layout_margin_bottom">
 
         <ImageView
             android:id="@+id/auto_image_view"
@@ -42,11 +69,4 @@
             />
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:id="@+id/btn_autoRecog_share"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/camera_share"/>
 </RelativeLayout>

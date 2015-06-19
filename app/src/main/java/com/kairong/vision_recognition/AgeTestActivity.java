@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.kairong.viAlertDialog.viAlertDialog;
 import com.kairong.viCamera.viCameraActivity;
 import com.kairong.viUtils.BitmapUtil;
+import com.kairong.viUtils.CameraUtil;
 import com.kairong.viUtils.DisplayUtil;
 
 /**
@@ -44,65 +45,57 @@ public class AgeTestActivity extends Activity {
         ImageView_Height = (int)(r.getDimension(R.dimen.at_imageview_height)) - 2*secondary_margin;
 
         mImageView = (ImageView)findViewById(R.id.age_test_face_image);
-        findViewById(R.id.age_test_image_layout).setOnClickListener(onClickListener_ImageView);
+        findViewById(R.id.age_test_image_layout).setOnLongClickListener(onLongClickListener_ImageView);
     }
-    private View.OnClickListener onClickListener_ImageView = new View.OnClickListener() {
+    // 长按打开相机
+    private View.OnLongClickListener onLongClickListener_ImageView = new View.OnLongClickListener() {
         @Override
-        public void onClick(View v) {
-            // 初始化viAlertDialog
-            final Dialog dialog = new viAlertDialog(AgeTestActivity.this, R.style.viAlertDialog,"获取照片");
-            dialog.show();
-            dialog.findViewById(R.id.btn_aldl_camera).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent imgIntent = new Intent(AgeTestActivity.this, viCameraActivity.class);
-                    imgIntent.putExtra("SrcTag", TAG);
-                    startActivityForResult(imgIntent, CAMERA_IMAGE_CODE);
-                    dialog.cancel();
-                }
-            });
-            dialog.findViewById(R.id.btn_aldl_gallery).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_PICK);
-                    intent.setType("image/*");//相片类型
-                    startActivityForResult(intent, GALLERY_IMAGE_CODE);
-                    dialog.cancel();
-                }
-            });
+        public boolean onLongClick(View v) {
+            Intent imgIntent = new Intent(AgeTestActivity.this, viCameraActivity.class);
+            imgIntent.putExtra("SrcTag", TAG);
+            startActivityForResult(imgIntent, CAMERA_IMAGE_CODE);
+            return false;
         }
     };
 
+    public void onSelectImage(View view){
+        // 初始化viAlertDialog
+        final Dialog dialog = new viAlertDialog(AgeTestActivity.this, R.style.viAlertDialog,"获取照片");
+        dialog.show();
+        ((viAlertDialog)dialog).init(AgeTestActivity.this,CAMERA_IMAGE_CODE,GALLERY_IMAGE_CODE,TAG);
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode!=RESULT_OK){
             Toast.makeText(AgeTestActivity.this,"没有获取任何图片",Toast.LENGTH_SHORT).show();
             return;
         }
+        String filepath;
         switch (requestCode) {
             case CAMERA_IMAGE_CODE:// 从相机添加图片
-                String filepath = data.getStringExtra("imagepath");
+                filepath = data.getStringExtra("imagepath");
                 bitmap = BitmapUtil.decodeSampledBitmapFromFile(filepath, ImageView_Width, ImageView_Height);
                 mImageView.setImageBitmap(bitmap);
                 break;
             case GALLERY_IMAGE_CODE:// 从相册获取图片
-                Uri uri = data.getData();
-                String[] proj = {MediaStore.Images.Media.DATA};
-                Cursor cursor = managedQuery(uri, proj, null, null, null);
-                // 获得图片索引值
-                int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                // 将光标移至开头
-                cursor.moveToFirst();
-                // 最后根据索引值获取图片路径
-                String filepath2 = cursor.getString(index);
+                filepath = CameraUtil.getImageFromSysGallery(AgeTestActivity.this,data);
                 // 判断图像大小是否超过最大值，超过则不加载
-                if (BitmapUtil.getImageSizeBeforeLoad(filepath2) > BitmapUtil.IMAGE_MAX_LOAD_SIZE) {
+                if (BitmapUtil.getImageSizeBeforeLoad(filepath) > BitmapUtil.IMAGE_MAX_LOAD_SIZE) {
                     Toast.makeText(this, "图片尺寸过大!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                bitmap = BitmapUtil.decodeSampledBitmapFromFile(filepath2, ImageView_Width, ImageView_Height);
+                bitmap = BitmapUtil.decodeSampledBitmapFromFile(filepath, ImageView_Width, ImageView_Height);
                 mImageView.setImageBitmap(bitmap);
                 break;
         }
+    }
+
+    @Override
+    public void finish() {
+        if(bitmap!=null&&!bitmap.isRecycled()){
+            bitmap.recycle();
+            bitmap = null;
+        }
+        super.finish();
     }
 }
