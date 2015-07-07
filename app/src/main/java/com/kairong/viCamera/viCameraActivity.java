@@ -31,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.kairong.sensorDetector.ScrnOrientDetector;
+import com.kairong.viUtils.DisplayUtil;
 import com.kairong.vision_recognition.R;
 import com.kairong.sensorDetector.ShakeDetector;
 
@@ -72,6 +73,10 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     private boolean isFocused = false;
     private boolean ifStopAFthread = false;
 
+    /*预览图片尺寸*/
+    private int PreviewImageWidth = 0;
+    private int PreviewImageHeight = 0;
+
     private final static int MSG_FOCUSED = 3235;
     private final static int MSG_FOCUS_FAILED = 3236;
     private static final int REQUEST_CODE_PICK_IMAGE = 3037;
@@ -96,6 +101,9 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);//拍照过程屏幕一直处于高亮
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        PreviewImageWidth = DisplayUtil.screenWidth;
+        PreviewImageHeight = DisplayUtil.screenHeight - (int)( 2*getResources().getDimension(R.dimen.photo_preview_bar_height));
 
         // 设置控件资源ID
         ImageView btn_gallery = (ImageView)findViewById(R.id.btn_take_photo_gallery);
@@ -343,7 +351,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         if(cameraPosition == 0||isFocused){
             // 设置照片分辨率
             if(cameraPosition == 1){
-                storeParameters.setPictureSize(1920, 1080);
+                storeParameters.setPictureSize(PreviewImageWidth, PreviewImageHeight);
                 // 设置参数并拍照
                 camera.setParameters(storeParameters);
             }

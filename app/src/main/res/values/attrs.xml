@@ -5,10 +5,6 @@
         <attr name="color2" format="reference|color"/>
         <attr name="color3" format="reference|color"/>
     </declare-styleable>
-    <declare-styleable name="CircleLayout">
-        <attr name="radius" format="dimension" />
-        <attr name="offset" format="integer" />
-    </declare-styleable>
     <declare-styleable name="CircleButton">
         <attr name="cb_color" format="color" />
         <attr name="cb_pressedRingWidth" format="dimension" />

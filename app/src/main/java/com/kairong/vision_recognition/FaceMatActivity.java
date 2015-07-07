@@ -44,6 +44,7 @@ import java.util.Vector;
 
 /**
  * Created by Kairong on 2015/6/3.
+ * mail:wangkrhust@gmail.com
  */
 public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnclickInterface{
     public int faceImageViewHeight;
@@ -85,8 +86,8 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
         Resources r = getResources();
         int activity_horizontal_margin = (int)(r.getDimension(R.dimen.activity_horizontal_margin));
         int activity_tertiary_margin = (int)(r.getDimension(R.dimen.activity_tertiary_margin));
-        faceImageViewWidth = (int)((DisplayUtil.screenWidth - activity_horizontal_margin*2 -
-                activity_tertiary_margin*4 - DisplayUtil.dip2px(4))/2);
+        faceImageViewWidth = (DisplayUtil.screenWidth - activity_horizontal_margin*2 -
+                activity_tertiary_margin*4 - DisplayUtil.dip2px(4))/2;
         faceImageViewHeight = (int)(r.getDimension(R.dimen.faceimage_parent_layout_height)) - 2*activity_tertiary_margin;
         // 初始化控件id
         leftFaceView = (ImageView)findViewById(R.id.left_face_image);

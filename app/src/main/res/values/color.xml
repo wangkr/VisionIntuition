@@ -18,7 +18,7 @@
     <color name="face_similarity_background_color">#83ca759f</color>
     <color name="take_photo_OK_button_press_color">#282828</color>
     <color name="take_photo_OK_button_color">#656565</color>
-    <color name="take_photo_toolbar_color">#AA333333</color>
+    <color name="take_photo_toolbar_color">#000000</color>
     <color name="vi_alertDialog_bk_color">#995dd0ff</color>
     <color name="vi_alertDialog_bar_color">#42a5ce</color>
     <color name="vi_alertDialog_cmBtn_color">#ffff4444</color>

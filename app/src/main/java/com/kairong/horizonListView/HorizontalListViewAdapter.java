@@ -95,7 +95,7 @@ public class HorizontalListViewAdapter extends BaseAdapter{
             if(imageStatus.get(position)>0) {
                 if (imageStatus.get(position) == LEFT_FACE_IMAGE_VIEW) {
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.hList_left_face_item_bk_color));
-                } else {
+                } else if(imageStatus.get(position) == RIGHT_FACE_IMAGE_VIEW){
                     convertView.setBackgroundColor(mContext.getResources().getColor(R.color.hList_right_face_item_bk_color));
                 }
             }

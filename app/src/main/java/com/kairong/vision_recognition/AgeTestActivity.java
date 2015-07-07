@@ -59,7 +59,6 @@ public class AgeTestActivity extends Activity {
     };
 
     public void onSelectImage(View view){
-        // 初始化viAlertDialog
         final Dialog dialog = new viAlertDialog(AgeTestActivity.this, R.style.viAlertDialog,"获取照片");
         dialog.show();
         ((viAlertDialog)dialog).init(AgeTestActivity.this,CAMERA_IMAGE_CODE,GALLERY_IMAGE_CODE,TAG);

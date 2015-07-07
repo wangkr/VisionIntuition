@@ -21,6 +21,7 @@
     <dimen name="photo_preview_ok_btnTextSize">18sp</dimen>
     <dimen name="photo_preview_bar_height">64dp</dimen>
     <dimen name="shutter_btn_size">56dp</dimen>
+    <dimen name="focus_image_size">128dp</dimen>
     <!-- Horizontal list view-->
     <dimen name="image_item_hpadding">3dp</dimen>
     <dimen name="image_item_vpadding">10dp</dimen>

@@ -2,23 +2,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
    >
-    <SurfaceView
-        android:id="@+id/surfaceview"
+    <ImageView
+        android:id="@+id/take_photo_bar_top"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="@dimen/photo_preview_bar_height"
+        android:background="@color/take_photo_toolbar_color">
+    </ImageView>
     <ImageView
         android:id="@+id/focus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/focus_image_size"
+        android:layout_height="@dimen/focus_image_size"
         android:layout_centerInParent="true"
         android:background="@drawable/focus_focusing"
         />
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/take_photo_preview"/>
-
     <RelativeLayout
         android:id="@+id/take_photo_bar_layout"
         android:layout_width="match_parent"
@@ -86,7 +82,19 @@
             />
 
     </RelativeLayout>
+    <ImageView
+        android:layout_above="@id/take_photo_bar_layout"
+        android:layout_below="@id/preview_photo_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/take_photo_preview"/>
 
-
+    <SurfaceView
+        android:layout_above="@id/take_photo_bar_top"
+        android:layout_below="@id/take_photo_bar_layout"
+        android:id="@+id/surfaceview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 
 </RelativeLayout>
