@@ -2,6 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
    >
+    <SurfaceView
+        android:id="@+id/surfaceview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/take_photo_preview"/>
     <ImageView
         android:id="@+id/take_photo_bar_top"
         android:layout_width="match_parent"
@@ -82,19 +91,5 @@
             />
 
     </RelativeLayout>
-    <ImageView
-        android:layout_above="@id/take_photo_bar_layout"
-        android:layout_below="@id/preview_photo_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/take_photo_preview"/>
-
-    <SurfaceView
-        android:layout_above="@id/take_photo_bar_top"
-        android:layout_below="@id/take_photo_bar_layout"
-        android:id="@+id/surfaceview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
 
 </RelativeLayout>

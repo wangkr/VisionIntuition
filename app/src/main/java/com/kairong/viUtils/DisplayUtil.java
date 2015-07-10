@@ -13,13 +13,7 @@ public final class DisplayUtil {
      */
     public static float scale = 0;
     public static float scaledDensity = 0;
-    public static int screenWidth = 0;
-    public static int screenHeight = 0;
-    public static int stateBarHeight = 0;
-    public static int activity_horizontal_margin = 0;
-    public static int activity_vertical_margin = 0;
-    public static int main_2_btn_size = 0;
-    public static int main_1_btn_size = 0;
+
     public static final int CHINESE = 20152016;
     public static final int NUMBER_OR_CHARACTER = 20152014;
 

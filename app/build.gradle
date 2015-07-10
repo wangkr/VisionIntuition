@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'Key'
             keyPassword '49365428'
-            storeFile file('C:/Users/Kairong/apkKeyFiles/visionIntuition_key.jks')
+            storeFile file('/home/wangkr/Documents/apkKeyFiles/visionIntuition_key.jks')
             storePassword '49365428wang'
         }
     }

@@ -1,5 +1,6 @@
 package com.kairong.myPathButton;
 
+import com.kairong.vision_recognition.viApplication;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.Animator.AnimatorListener;
 import com.nineoldandroids.view.ViewPropertyAnimator;
@@ -27,6 +28,7 @@ public class composerLayout extends RelativeLayout {
 	private boolean hasInit = false; // 初始化了没有
 	private boolean areButtonsShowing = false;// 有没有展开
 	private Context mycontext;
+	private viApplication app;
 	private ImageView cross; // 主按钮中间那个十字
 	private RelativeLayout rlButton;// 主按钮
 	private myAnimations myani; // 动画类
@@ -38,19 +40,22 @@ public class composerLayout extends RelativeLayout {
 	 * 咁搞的话~好多人可能唔知点用，而且参数太多（例如N个子按钮）处理起身亦比较罗嗦。
 	 * 所以而家干脆搞个init()函数，由java代码调用，唔读xml喇。 所以构造函数只记录个context就算
 	 */
-	public composerLayout(Context context, AttributeSet attrs, int defStyle) {
+	public composerLayout(viApplication app,Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		this.mycontext = context;
+		this.app = app;
 	}
 
-	public composerLayout(Context context, AttributeSet attrs) {
+	public composerLayout(viApplication app,Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.mycontext = context;
+		this.app = app;
 	}
 
-	public composerLayout(Context context) {
+	public composerLayout(viApplication app,Context context) {
 		super(context);
 		this.mycontext = context;
+		this.app = app;
 	}
 
 	/**
@@ -192,7 +197,7 @@ public class composerLayout extends RelativeLayout {
 		crosslps.addRule(CENTER_IN_PARENT, RelativeLayout.TRUE);
 		cross.setLayoutParams(crosslps);
 		rlButton.addView(cross);
-		myani = new myAnimations(rl1, pCode, radius);
+		myani = new myAnimations(app,rl1, pCode, radius);
 		rlButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

@@ -5,10 +5,14 @@ import java.util.List;
 
 import com.kairong.viUtils.DisplayUtil;
 import com.kairong.vision_recognition.R;
+import com.kairong.vision_recognition.viApplication;
 import com.nineoldandroids.view.ViewPropertyAnimator;
 
+import android.app.Application;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +43,9 @@ public class myAnimations {
 	public static Rect composerBtnRect = null; // composerButton view的Rect
 	private List<ViewPropertyAnimator> viewAnimators = new ArrayList<ViewPropertyAnimator>();
 
+	private viApplication app;
+
+	private String TAG = "myAnimations";
 	/**
 	 * 构造函数
 	 * 
@@ -50,26 +57,15 @@ public class myAnimations {
 	 * @param radius
 	 *            半径
 	 */
-	public myAnimations(ViewGroup comlayout, int poscode, int radius) {
+	public myAnimations(final viApplication app,ViewGroup comlayout, int poscode, int radius) {
 		this.pc = poscode;
 		this.clayout = comlayout;
 		this.amount = clayout.getChildCount();
 		this.R = radius;
+		this.app = app;
 
-		// 初始化一些activity_main控件位置信息
-		// 计算composerButtonWrapper 和 composerButtons的坐标信息
-		composerRect = new Rect();
-		composerBtnRect = new Rect();
+		initComposerBtns(app);
 
-		composerRect.top = DisplayUtil.screenHeight/2 + (DisplayUtil.main_1_btn_size/2);
-		composerRect.left = DisplayUtil.activity_horizontal_margin;
-		composerRect.bottom = DisplayUtil.screenHeight - DisplayUtil.activity_vertical_margin;
-		composerRect.right = DisplayUtil.screenWidth - DisplayUtil.activity_horizontal_margin;
-
-		composerBtnRect.top = composerRect.top;
-		composerBtnRect.left = DisplayUtil.screenWidth/2 - (DisplayUtil.main_2_btn_size)/2;
-		composerBtnRect.right = DisplayUtil.screenWidth/2 + (DisplayUtil.main_2_btn_size)/2;
-		composerBtnRect.bottom = composerBtnRect.top + (DisplayUtil.main_2_btn_size);
 		// 初始化动画，每个view对应一个animator
 		for (int i = 0; i < amount; i++) {
 			View childAt = clayout.getChildAt(i);
@@ -112,6 +108,23 @@ public class myAnimations {
 		}
 	}
 
+	public void initComposerBtns(final viApplication app){
+		// 初始化一些activity_main控件位置信息
+		// 计算composerButtonWrapper 和 composerButtons的坐标信息
+		composerRect = new Rect();
+		composerBtnRect = new Rect();
+		
+		composerRect.top = app.getScreenHeight()/2 + (app.getMain_1_btn_size()/2);
+		Log.d(TAG,"ScreenHeight"+app.getScreenHeight());
+		composerRect.left = app.getActivity_horizontal_margin();
+		composerRect.bottom = app.getScreenHeight() - app.getActivity_vertical_margin();
+		composerRect.right = app.getScreenWidth() - app.getActivity_horizontal_margin();
+
+		composerBtnRect.top = composerRect.top;
+		composerBtnRect.left = app.getScreenWidth()/2 - (app.getMain_2_btn_size())/2;
+		composerBtnRect.right = app.getScreenWidth()/2 + (app.getMain_2_btn_size())/2;
+		composerBtnRect.bottom = composerBtnRect.top + (app.getMain_2_btn_size());
+	}
 //	private class AnimListener implements AnimatorListener {
 //
 //		private View target;
@@ -146,7 +159,7 @@ public class myAnimations {
 //	}
 
 	/**
-	 * 弹几个按钮出嚟
+	 * 弹几个按钮出来
 	 * 
 	 * @param durationMillis
 	 *            用几多时间
@@ -167,6 +180,7 @@ public class myAnimations {
 				deltaY = (int) (Math.sin((angleoffset+offangle * i) * Math.PI / 180) * R);
 				deltaX = (int) (Math.cos((angleoffset+offangle * i) * Math.PI / 180) * R);
 			}
+			Log.d(TAG,"composerBtnRect left:"+composerBtnRect.left);
 
 			/**Created by Kairong Wang,2015.05.29*/
 			Animation animation = new TranslateAnimation(0,deltaX,0,deltaY);
@@ -223,14 +237,15 @@ public class myAnimations {
 			inoutimagebutton.setLayoutParams(params);
 			double offangle = fullangle / (amount - 1);
 
-			final double deltaY, deltaX;
+			final int deltaY, deltaX;
 			if (pc == LEFTCENTER || pc == RIGHTCENTER) {
-				deltaX = Math.sin((angleoffset+offangle * i) * Math.PI / 180) * R;
-				deltaY = Math.cos((angleoffset+offangle * i) * Math.PI / 180) * R;
+				deltaX = (int) (Math.sin((angleoffset+offangle * i) * Math.PI / 180) * R);
+				deltaY = (int) (Math.cos((angleoffset+offangle * i) * Math.PI / 180) * R);
 			} else {
-				deltaY = Math.sin((angleoffset+offangle * i) * Math.PI / 180) * R;
-				deltaX = Math.cos((angleoffset+offangle * i) * Math.PI / 180) * R;
+				deltaY = (int) (Math.sin((angleoffset+offangle * i) * Math.PI / 180) * R);
+				deltaX = (int) (Math.cos((angleoffset+offangle * i) * Math.PI / 180) * R);
 			}
+			Log.d(TAG,"composerBtnRect left:"+composerBtnRect.left);
 			/**Created by Kairong Wang,2015.05.29*/
 			Animation animation = new TranslateAnimation((int)deltaX,0,(int)deltaY,0);
 			animation.setFillAfter(true);
@@ -246,8 +261,8 @@ public class myAnimations {
 					if (!isOpen) {
 						// 获取每个按钮的layout属性
 						inoutimagebutton.clearAnimation();
-						inoutimagebutton.setVisibility(View.INVISIBLE);
-						Log.d("myAnimation", "onAnimationEnd");
+						inoutimagebutton.setVisibility(View.GONE);
+						Log.d(TAG, "onAnimationEnd");
 					}
 
 				}

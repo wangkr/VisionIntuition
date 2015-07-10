@@ -25,6 +25,7 @@ import com.kairong.viUtils.DisplayUtil;
  */
 public class AutoRecgActivity extends Activity{
 
+    private viApplication app = null;
     public int ImageView_Width;
     public int ImageView_Height;
     private ImageView mImageView = null;
@@ -46,8 +47,9 @@ public class AutoRecgActivity extends Activity{
         int secondary_margin = (int)(r.getDimension(R.dimen.activity_secondary_margin));
         int select_image_layout_height = (int)(r.getDimension(R.dimen.at_select_image_btn_height));
         int at_image_layout_marginBottom = (int)(r.getDimension(R.dimen.at_image_layout_margin_bottom));
-        ImageView_Width = DisplayUtil.screenWidth - 2*activity_horizontal_margin - 2*secondary_margin;
-        ImageView_Height = DisplayUtil.screenHeight - 2*activity_vertical_margin - 2*secondary_margin - select_image_layout_height - at_image_layout_marginBottom;
+        app = (viApplication)getApplication();
+        ImageView_Width = app.getScreenWidth() - 2*app.getActivity_horizontal_margin() - 2*secondary_margin;
+        ImageView_Height = app.getScreenHeight() - 2*activity_vertical_margin - 2*secondary_margin - select_image_layout_height - at_image_layout_marginBottom;
 
         filepath = getIntent().getStringExtra("imagepath");
         mImageView = (ImageView)findViewById(R.id.auto_image_view);

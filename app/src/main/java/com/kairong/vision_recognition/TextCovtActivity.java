@@ -23,6 +23,8 @@ import com.kairong.viUtils.DisplayUtil;
  * Created by Kairong on 2015/6/3.
  */
 public class TextCovtActivity extends Activity {
+    private viApplication app = null;
+
     public int ImageView_Width;
     public int ImageView_Height;
     private ImageView mImageView = null;
@@ -36,13 +38,10 @@ public class TextCovtActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.text_conversion_activity);
-
+        app = (viApplication)getApplication();
         // 初始化age_test_activity.xml 的一些信息
-        Resources r = getResources();
-        int activity_horizontal_margin = (int)(r.getDimension(R.dimen.activity_horizontal_margin));
-        int secondary_margin = (int)(r.getDimension(R.dimen.activity_secondary_margin));
-        ImageView_Width = DisplayUtil.screenWidth - 2*activity_horizontal_margin - 2*secondary_margin;
-        ImageView_Height = (int)(r.getDimension(R.dimen.tc_imageview_height)) - 2*secondary_margin;
+        ImageView_Width = app.getScreenWidth() - 2*app.getActivity_horizontal_margin() - 2*app.getSecondary_margin();
+        ImageView_Height = (int)(getResources().getDimension(R.dimen.tc_imageview_height)) - 2*app.getSecondary_margin();
 
         mImageView = (ImageView)findViewById(R.id.text_conversion_image);
         findViewById(R.id.text_conversion_layout).setOnLongClickListener(onLongClickListener_ImageView);

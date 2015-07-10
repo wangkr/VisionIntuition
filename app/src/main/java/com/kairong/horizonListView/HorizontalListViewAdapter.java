@@ -22,6 +22,7 @@ import com.kairong.viUtils.BitmapUtil;
 import com.kairong.viUtils.viSize;
 import com.kairong.vision_recognition.FaceMatActivity;
 import com.kairong.vision_recognition.R;
+import com.kairong.vision_recognition.viApplication;
 
 import java.util.List;
 import java.util.Vector;
@@ -29,6 +30,7 @@ import java.util.Vector;
 public class HorizontalListViewAdapter extends BaseAdapter{
     private int iconId;
     private List<String> filepaths;
+    private viApplication app;
     private Context mContext;
     private LayoutInflater mInflater;
     private Vector<Integer> imageStatus;
@@ -39,8 +41,9 @@ public class HorizontalListViewAdapter extends BaseAdapter{
     private final int RIGHT_FACE_IMAGE_VIEW = 2;
     private final int NONE_FACE_IMAGE = -1;
 
-    public HorizontalListViewAdapter(Context context, List<String> filepaths,Vector<Integer> imageStatus,int iconId){
+    public HorizontalListViewAdapter(viApplication app,Context context, List<String> filepaths,Vector<Integer> imageStatus,int iconId){
         this.mContext = context;
+        this.app = app;
         this.filepaths = filepaths;
         this.imageStatus = imageStatus;
         this.iconId = iconId;
@@ -87,7 +90,7 @@ public class HorizontalListViewAdapter extends BaseAdapter{
             holder.mImage.setImageBitmap(iconBitmap);
         }else{
             // 为了避免大内存分配，采取加载samplesize的图片
-            viSize reqSize = BitmapUtil.getImageReq(filepaths.get(position));
+            viSize reqSize = BitmapUtil.getImageReq(filepaths.get(position),app.getIMAGE_LOAD_IN_MEM_MAX_SIZE());
             Bitmap temp = BitmapUtil.decodeSampledBitmapFromFile(filepaths.get(position),reqSize);
             faceBitmap = ThumbnailUtils.extractThumbnail(temp,w,h,ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
             holder.mImage.setImageBitmap(faceBitmap);

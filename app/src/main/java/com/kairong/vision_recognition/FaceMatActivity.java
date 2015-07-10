@@ -47,6 +47,8 @@ import java.util.Vector;
  * mail:wangkrhust@gmail.com
  */
 public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnclickInterface{
+    private viApplication app = null;
+
     public int faceImageViewHeight;
     public int faceImageViewWidth;
 
@@ -81,14 +83,11 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.face_match_activity);
-
+        app = (viApplication)getApplication();
         // 初始化face_match_activity.xml 的一些信息
-        Resources r = getResources();
-        int activity_horizontal_margin = (int)(r.getDimension(R.dimen.activity_horizontal_margin));
-        int activity_tertiary_margin = (int)(r.getDimension(R.dimen.activity_tertiary_margin));
-        faceImageViewWidth = (DisplayUtil.screenWidth - activity_horizontal_margin*2 -
-                activity_tertiary_margin*4 - DisplayUtil.dip2px(4))/2;
-        faceImageViewHeight = (int)(r.getDimension(R.dimen.faceimage_parent_layout_height)) - 2*activity_tertiary_margin;
+        faceImageViewWidth = (app.getScreenWidth() - app.getActivity_horizontal_margin()*2 -
+                app.getTertiary_margin()*4 - DisplayUtil.dip2px(4))/2;
+        faceImageViewHeight = (int)(getResources().getDimension(R.dimen.faceimage_parent_layout_height)) - 2*app.getTertiary_margin();
         // 初始化控件id
         leftFaceView = (ImageView)findViewById(R.id.left_face_image);
         rightFaceView = (ImageView)findViewById(R.id.right_face_image);
@@ -100,7 +99,7 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
         viHintDialog = new viHintDialog(this,R.style.viHintDialog);
         imagePathsList = new ArrayList<String>();
         imageStatus = new Vector<Integer>();
-        hListViewAdapter = new HorizontalListViewAdapter(getApplicationContext(),imagePathsList,imageStatus,R.drawable.hlistview_add_btn);
+        hListViewAdapter = new HorizontalListViewAdapter(app,getApplicationContext(),imagePathsList,imageStatus,R.drawable.hlistview_add_btn);
         hListView.setAdapter(hListViewAdapter);
         hListView.setOnItemClickListener(onItemClickListener_hList);
         hListView.setOnItemLongClickListener(onItemLongClickListener_hList);

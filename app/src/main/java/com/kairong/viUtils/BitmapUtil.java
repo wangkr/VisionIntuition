@@ -21,8 +21,6 @@ import java.io.InputStream;
  */
 public final class BitmapUtil {
 
-    public static int IMAGE_LOAD_IN_MEM_MAX_WIDTH;
-    public static int IMAGE_LOAD_IN_MEM_MAX_SIZE;
     public static int IMAGE_MAX_LOAD_SIZE = 3145728;
     /**
      * 取得指定区域的图形
@@ -399,7 +397,7 @@ public final class BitmapUtil {
      * @param filepath：图片路径
      * @return
      */
-    public static viSize getImageReq(String filepath){
+    public static viSize getImageReq(String filepath,int image_load_in_mem_max_size){
         int reqWidth,reqHeight;
         double scale;
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -408,9 +406,10 @@ public final class BitmapUtil {
         int imageHeight = options.outHeight;
         int imageWidth = options.outWidth;
         // 图像大小不能超过一定的阈值
+
         int imageSize = imageHeight*imageWidth;
-        if(imageSize>IMAGE_LOAD_IN_MEM_MAX_SIZE){
-            scale = Math.sqrt(IMAGE_LOAD_IN_MEM_MAX_SIZE*1.0/imageSize);
+        if(imageSize>image_load_in_mem_max_size){
+            scale = Math.sqrt(image_load_in_mem_max_size*1.0/imageSize);
         }else{
             scale = 1.0;
         }

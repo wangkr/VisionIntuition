@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.kairong.sensorDetector.ScrnOrientDetector;
 import com.kairong.viUtils.DisplayUtil;
 import com.kairong.vision_recognition.R;
 import com.kairong.sensorDetector.ShakeDetector;
+import com.kairong.vision_recognition.viApplication;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -61,7 +63,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     private RelativeLayout take_photo_bar_rl = null;
     private RelativeLayout preview_photo_rl  = null;
     private Bitmap saved_photo = null;
-    private Parameters storeParameters = null;
+    private Parameters previewParameters = null;
     private Class resultClass = null;
     private Class destClass = null;
     private Thread myAFthread = null;                   // 自动对焦监测线程
@@ -73,9 +75,9 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     private boolean isFocused = false;
     private boolean ifStopAFthread = false;
 
-    /*预览图片尺寸*/
-    private int PreviewImageWidth = 0;
-    private int PreviewImageHeight = 0;
+    /*存储的图片尺寸*/
+    private int storeImageWidth = 0;
+    private int storeImageHeight = 0;
 
     private final static int MSG_FOCUSED = 3235;
     private final static int MSG_FOCUS_FAILED = 3236;
@@ -102,8 +104,8 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);//拍照过程屏幕一直处于高亮
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        PreviewImageWidth = DisplayUtil.screenWidth;
-        PreviewImageHeight = DisplayUtil.screenHeight - (int)( 2*getResources().getDimension(R.dimen.photo_preview_bar_height));
+        storeImageWidth = ((viApplication)getApplication()).getScreenHeight() - (int)( 2*getResources().getDimension(R.dimen.photo_preview_bar_height));
+        storeImageHeight = ((viApplication)getApplication()).getScreenWidth();
 
         // 设置控件资源ID
         ImageView btn_gallery = (ImageView)findViewById(R.id.btn_take_photo_gallery);
@@ -231,14 +233,15 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         if(camera == null){
-            camera = camera.open();
+            camera = Camera.open();
+
             try {
                 camera.setPreviewDisplay(holder);//通过surfaceview显示取景画面
                 camera.setDisplayOrientation(90);
                 camera.startPreview();// 开始预览
                 // 设置存储照片参数
-                storeParameters = camera.getParameters();
-                storeParameters.setPictureFormat(PixelFormat.JPEG);
+                previewParameters = camera.getParameters();
+                previewParameters.setPictureFormat(PixelFormat.JPEG);
 
                 isPreviewing = true;
 
@@ -351,9 +354,10 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         if(cameraPosition == 0||isFocused){
             // 设置照片分辨率
             if(cameraPosition == 1){
-                storeParameters.setPictureSize(PreviewImageWidth, PreviewImageHeight);
+                previewParameters.setPictureSize(((viApplication)getApplication()).getScreenHeight(), 
+                        ((viApplication)getApplication()).getScreenWidth());
                 // 设置参数并拍照
-                camera.setParameters(storeParameters);
+                camera.setParameters(previewParameters);
             }
             camera.takePicture(null, null, jpeg);
         }
@@ -399,6 +403,11 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
             }else{
                 matRotate.setRotate(picRotationDegree);
             }
+            Log.d(TAG, "image width "+saved_photo.getWidth()+"image height "+saved_photo.getHeight());
+            // 先对图片进行剪切
+            int h = 0, w = (int)( 2*getResources().getDimension(R.dimen.photo_preview_bar_height));
+            saved_photo = Bitmap.createBitmap(saved_photo, w, h, storeImageWidth, storeImageHeight,null, true);
+            // 再进行旋转
             saved_photo = Bitmap.createBitmap(saved_photo, 0, 0, saved_photo.getWidth(), saved_photo.getHeight(), matRotate, true);
             saved_photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             bos.flush();    // 刷新此缓冲区的输出流

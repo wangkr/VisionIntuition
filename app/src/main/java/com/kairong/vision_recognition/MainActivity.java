@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,9 +23,12 @@ import com.kairong.circleButton.CircleButton;
 import com.kairong.viCamera.viCameraActivity;
 import com.kairong.myPathButton.myAnimations;
 import com.kairong.viUtils.BitmapUtil;
+import com.kairong.viUtils.DisplayUtil;
 
 
 public class MainActivity extends Activity {
+    private viApplication app = null;
+
     private ImageView composerButtonShowHideButtonIcon = null;
     private RelativeLayout composerButtonWrapper = null;
     private long exitTime = 0;
@@ -36,6 +40,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        app = (viApplication)getApplication();
         // 设置竖屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
@@ -59,7 +64,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,viCameraActivity.class);
-                intent.putExtra("DestTag","AutoRecgActivity");
+                intent.putExtra("DestTag", "AutoRecgActivity");
                 startActivity(intent);
             }
         });
@@ -71,21 +76,20 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
             }
         });
-        myanimation = new myAnimations(composerButtonWrapper,myAnimations.CENTERTOP,320);
+        myanimation = new myAnimations(app,composerButtonWrapper,myAnimations.CENTERTOP,320);
         composerButtonShowHideButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(myanimation.isOpen()){
+                if (myanimation.isOpen()) {
                     myanimation.startAnimationsOut(500);
                     composerButtonShowHideButtonIcon.startAnimation(myAnimations.getRotateAnimation(-45, 0, 500));
-                }
-                else{
+                } else {
                     myanimation.startAnimationsIn(500);
                     composerButtonShowHideButtonIcon.startAnimation(myAnimations.getRotateAnimation(0, -45, 500));
                 }
             }
         });
-        Log.d("MainActivity", "OnCreate success!");
+        Log.d(TAG, "OnCreate success!");
     }
 
     private View.OnClickListener cpBtnListener = new View.OnClickListener() {
