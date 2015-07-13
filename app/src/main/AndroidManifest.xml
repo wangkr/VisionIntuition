@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme"
         android:name=".viApplication">
         <activity
-            android:name="com.kairong.viCamera.viCameraActivity">
+            android:name="com.kairong.viUIControls.viCamera.viCameraActivity">
         </activity>
         <activity
             android:name=".MainActivity"

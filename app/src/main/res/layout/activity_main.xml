@@ -8,88 +8,114 @@
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
     android:background="@color/activity_background_color"
     android:theme="@android:style/Theme.NoTitleBar">
-    <TextView
-        android:id="@+id/text_title"
+    <!-- Octopus标题布局-->
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_centerHorizontal="true"
-        android:textSize="60sp"
-        android:textColor="@color/text_title_color"
-        android:text="@string/text_title"
-        />
+        android:layout_marginTop="@dimen/octopus_layout_marTop"
+        android:layout_centerHorizontal="true">
+        <TextView
+            android:id="@+id/text_title_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="@dimen/title_text_bk_size"
+            android:textColor="@android:color/white"
+            android:text="@string/text_title"
+            />
+        <TextView
+            android:id="@+id/text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="@dimen/title_text_size"
+            android:textColor="@color/text_title_color"
+            android:text="@string/text_title"
+            />
+    </RelativeLayout>
+    <!-- Octopus背景-->
     <ImageView
         android:layout_width="@dimen/main_mascot_width"
         android:layout_height="@dimen/main_mascot_height"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/octopus_main" />
+        android:background="@mipmap/octopus_main" />
+    <!-- 打开图片按钮布局-->
     <RelativeLayout
         android:layout_width="@dimen/open_pic_layout_width"
         android:layout_height="@dimen/main_1_btn_size"
-        android:paddingLeft="@dimen/main_1_btn_LRpadding"
-        android:paddingRight="@dimen/main_1_btn_LRpadding"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/open_pic_layout"
         >
-        <com.kairong.circleButton.CircleButton
+        <com.kairong.viUIControls.circleButton.CircleButton
             android:layout_width="@dimen/main_1_btn_size"
             android:layout_height="@dimen/main_1_btn_size"
             android:id="@+id/btn_camera"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             circlebutton:cb_color="@color/camer_open_button_color"
-            android:src="@drawable/camera_open_icn"
+            android:src="@mipmap/alert_cmbtn_icn"
+            circlebutton:cb_pressedRingWidth="@dimen/main_1_cb_pressedRingWidth"
             />
-        <com.kairong.circleButton.CircleButton
+        <com.kairong.viUIControls.circleButton.CircleButton
             android:layout_width="@dimen/main_1_btn_size"
             android:layout_height="@dimen/main_1_btn_size"
             android:id="@+id/btn_gallery"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             circlebutton:cb_color="@color/gallery_open_button_color"
-            android:src="@drawable/gallery_open_icn"
+            android:src="@mipmap/alert_glbtn_icn"
+            circlebutton:cb_pressedRingWidth="@dimen/main_1_cb_pressedRingWidth"
             />
         </RelativeLayout>
-
+    <!-- 组合按钮子按钮布局-->
     <RelativeLayout
         android:id="@+id/composer_wrapper_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/open_pic_layout"
         android:layout_centerHorizontal="true">
-        <com.kairong.circleButton.CircleButton
-            android:id="@+id/btn_composer_face_match"
+        <com.kairong.viUIControls.circleButton.CircleButton
+            android:id="@+id/btn_composer_setting"
             android:layout_width="@dimen/main_2_btn_size"
             android:layout_height="@dimen/main_2_btn_size"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/face_match_button_icn"
+            android:src="@mipmap/setting_button_icn"
             circlebutton:cb_color="@color/comp_child_buttons_color"
             android:visibility="invisible"/>
-        <com.kairong.circleButton.CircleButton
-            android:id="@+id/btn_composer_age_test"
-            android:layout_width="@dimen/main_2_btn_size"
-            android:layout_height="@dimen/main_2_btn_size"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/age_test_button_icn"
-            circlebutton:cb_color="@color/comp_child_buttons_color"
-            android:visibility="invisible"/>
-        <com.kairong.circleButton.CircleButton
+        <com.kairong.viUIControls.circleButton.CircleButton
             android:id="@+id/btn_composer_text_conversion"
             android:layout_width="@dimen/main_2_btn_size"
             android:layout_height="@dimen/main_2_btn_size"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/text_convertion_button_icn"
+            android:src="@mipmap/text_convertion_button_icn"
+            circlebutton:cb_color="@color/comp_child_buttons_color"
+            android:visibility="invisible"/>
+        <com.kairong.viUIControls.circleButton.CircleButton
+            android:id="@+id/btn_composer_age_test"
+            android:layout_width="@dimen/main_2_btn_size"
+            android:layout_height="@dimen/main_2_btn_size"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/age_test_button_icn"
+            circlebutton:cb_color="@color/comp_child_buttons_color"
+            android:visibility="invisible"/>
+        <com.kairong.viUIControls.circleButton.CircleButton
+            android:id="@+id/btn_composer_face_match"
+            android:layout_width="@dimen/main_2_btn_size"
+            android:layout_height="@dimen/main_2_btn_size"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/face_match_button_icn"
             circlebutton:cb_color="@color/comp_child_buttons_color"
             android:visibility="invisible"/>
     </RelativeLayout>
+    <!-- 组合按钮父按钮布局-->
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/open_pic_layout"
         android:layout_centerHorizontal="true">
-        <com.kairong.circleButton.CircleButton
+        <com.kairong.viUIControls.circleButton.CircleButton
             android:id="@+id/btn_composer_button"
             android:layout_width="@dimen/main_2_btn_size"
             android:layout_height="@dimen/main_2_btn_size"
@@ -99,11 +125,11 @@
             />
         <ImageView
             android:id="@+id/btn_composer_button_icon"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+            android:layout_width="@dimen/icn_plus_size"
+            android:layout_height="@dimen/icn_plus_size"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/icn_plus"
+            android:src="@mipmap/icn_plus"
             />
     </RelativeLayout>
 </RelativeLayout>

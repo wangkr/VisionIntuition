@@ -2,19 +2,16 @@ package com.kairong.vision_recognition;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 
-import com.kairong.viCamera.CamTargetList;
-import com.kairong.viUtils.BitmapUtil;
+import com.kairong.viUIControls.viCamera.CamTargetList;
 import com.kairong.viUtils.DisplayUtil;
-import com.kairong.myPathButton.myAnimations;
 
 /**
  * Created by Kairong on 2015/6/3.
  * mail:wangkrhust@gmail.com
+ * blog:http://blog.csdn.net/wangkr111
  */
 public class WelcomeActivity extends Activity {
     private viApplication app;

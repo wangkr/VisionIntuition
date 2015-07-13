@@ -3,24 +3,21 @@ package com.kairong.vision_recognition;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.kairong.viAlertDialog.viAlertDialog;
-import com.kairong.viCamera.viCameraActivity;
+import com.kairong.viUIControls.viAlertDialog.viAlertDialog;
+import com.kairong.viUIControls.viCamera.viCameraActivity;
 import com.kairong.viUtils.BitmapUtil;
 import com.kairong.viUtils.CameraUtil;
-import com.kairong.viUtils.DisplayUtil;
 
 /**
- * Created by Kairong on 2015/6/3.
+ * Created by Kairong on 2015/6/3 at USTC
+ * mail:wangkrhust@gmail.com
+ * blog:http://blog.csdn.net/wangkr111
  */
 public class AgeTestActivity extends Activity {
     private viApplication app = null;

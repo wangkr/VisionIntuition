@@ -83,7 +83,7 @@
 
         </RelativeLayout>
         <!-- 圆形进度等待动画-->
-        <com.kairong.circleProgress.CircleProgress
+        <com.kairong.viUIControls.circleProgress.CircleProgress
         android:id="@+id/face_match_image_progress"
         android:layout_width="@dimen/circleProgress_view_size"
         android:layout_height="@dimen/circleProgress_view_size"
@@ -150,12 +150,12 @@
             android:layout_height="match_parent"
             android:background="@color/semitransparent_color"
             android:layout_centerInParent="true"/>
-        <com.kairong.horizonListView.HorizontalListView
+        <com.kairong.viUIControls.horizonListView.HorizontalListView
             android:id="@+id/horizon_listView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true">
-        </com.kairong.horizonListView.HorizontalListView>
+        </com.kairong.viUIControls.horizonListView.HorizontalListView>
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="@dimen/hlist_gallery_frame_height"
@@ -180,7 +180,7 @@
             android:id="@+id/face_match_mascot"
             android:layout_width="@dimen/secondary_mascot_size"
             android:layout_height="@dimen/secondary_mascot_size"
-            android:background="@drawable/octopus"/>
+            android:background="@mipmap/octopus"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

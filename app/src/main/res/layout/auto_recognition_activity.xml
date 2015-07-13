@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:text="Text View"/>
 
-        <com.kairong.circleProgress.CircleProgress
+        <com.kairong.viUIControls.circleProgress.CircleProgress
             android:id="@+id/progress"
             android:layout_width="100dp"
             android:layout_height="100dp"

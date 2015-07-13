@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,18 +17,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kairong.circleButton.CircleButton;
-import com.kairong.viCamera.viCameraActivity;
-import com.kairong.myPathButton.myAnimations;
+import com.kairong.viUIControls.circleButton.CircleButton;
+import com.kairong.viUIControls.viCamera.viCameraActivity;
+import com.kairong.viUIControls.myPathButton.myAnimations;
 import com.kairong.viUtils.BitmapUtil;
-import com.kairong.viUtils.DisplayUtil;
 
+/**
+ * Created by wangkr on 15-7-10 at USTC
+ * mail:wangkrhust@gmail.com
+ * blog:http://blog.csdn.net/wangkr111
+ */
 
 public class MainActivity extends Activity {
     private viApplication app = null;
 
     private ImageView composerButtonShowHideButtonIcon = null;
-    private RelativeLayout composerButtonWrapper = null;
     private long exitTime = 0;
     private static final int REQUEST_CODE_PICK_IMAGE = 3022;
     private myAnimations myanimation = null;
@@ -52,11 +53,13 @@ public class MainActivity extends Activity {
         ImageView btn_text_conversion = (ImageView)findViewById(R.id.btn_composer_text_conversion);
         ImageView composerButtonShowHideButton = (ImageView)findViewById(R.id.btn_composer_button);
         TextView title_text = (TextView)findViewById(R.id.text_title);
+        TextView title_text_bk = (TextView)findViewById(R.id.text_title_background);
+        RelativeLayout composerButtonWrapper = (RelativeLayout)findViewById(R.id.composer_wrapper_layout);
         composerButtonShowHideButtonIcon = (ImageView)findViewById(R.id.btn_composer_button_icon);
-        composerButtonWrapper = (RelativeLayout)findViewById(R.id.composer_wrapper_layout);
 
         Typeface typeface = Typeface.createFromAsset(getAssets(),"fonts/SNAP ITC.TTF");
         title_text.setTypeface(typeface);
+        title_text_bk.setTypeface(typeface);
         btn_face_match.setOnClickListener(cpBtnListener);
         btn_age_test.setOnClickListener(cpBtnListener);
         btn_text_conversion.setOnClickListener(cpBtnListener);
@@ -76,16 +79,16 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
             }
         });
-        myanimation = new myAnimations(app,composerButtonWrapper,myAnimations.CENTERTOP,320);
+        myanimation = new myAnimations(app,composerButtonWrapper,myAnimations.CENTERTOP,380,30,120);
         composerButtonShowHideButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (myanimation.isOpen()) {
                     myanimation.startAnimationsOut(500);
-                    composerButtonShowHideButtonIcon.startAnimation(myAnimations.getRotateAnimation(-45, 0, 500));
+                    composerButtonShowHideButtonIcon.startAnimation(myAnimations.getRotateAnimation(-135, 0, 500));
                 } else {
                     myanimation.startAnimationsIn(500);
-                    composerButtonShowHideButtonIcon.startAnimation(myAnimations.getRotateAnimation(0, -45, 500));
+                    composerButtonShowHideButtonIcon.startAnimation(myAnimations.getRotateAnimation(0, -135, 500));
                 }
             }
         });
@@ -168,7 +171,7 @@ public class MainActivity extends Activity {
             // 如果“扩展”按钮是开状态，则首先关闭“扩展”按钮
             if(myanimation.isOpen()){
                 myanimation.startAnimationsOut(500);
-                composerButtonShowHideButtonIcon.startAnimation(myAnimations.getRotateAnimation(-45, 0, 500));
+                composerButtonShowHideButtonIcon.startAnimation(myAnimations.getRotateAnimation(-135, 0, 500));
                 return;
             }
             Toast.makeText(getApplicationContext(),"再按一次退出程序",Toast.LENGTH_SHORT).show();

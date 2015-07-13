@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:circleprogress="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="@color/crop_image_layout_bk">
+        <com.kairong.viUIControls.viCropImage.CropImageView
+            android:id="@+id/crop_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/photo_preview_bar_height"
+        android:background="@android:color/black"
+        android:layout_alignParentTop="true">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/cropImage_title"
+            android:textColor="@android:color/holo_blue_light"
+            android:textSize="@dimen/cropImage_title_size"/>
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/photo_preview_bar_height"
+        android:background="@android:color/black"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/btn_crop_cancell"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/last_step"
+            android:textColor="@android:color/holo_blue_light"
+            android:background="transparent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            />
+        <Button
+            android:id="@+id/btn_crop_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/done_text"
+            android:textColor="@android:color/holo_blue_light"
+            android:background="transparent"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            />
+    </RelativeLayout>
+</RelativeLayout>

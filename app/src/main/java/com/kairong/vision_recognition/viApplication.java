@@ -7,7 +7,9 @@ import android.util.DisplayMetrics;
 import com.kairong.viUtils.DisplayUtil;
 
 /**
- * Created by wangkr on 15-7-10.
+ * Created by wangkr on 15-7-10 at USTC
+ * mail:wangkrhust@gmail.com
+ * blog:http://blog.csdn.net/wangkr111
  */
 public class viApplication extends Application{
     private static final String APP_NAME="Vision Intuition";

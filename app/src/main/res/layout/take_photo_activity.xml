@@ -66,8 +66,7 @@
         android:background="@color/take_photo_toolbar_color"
         android:visibility="invisible"
         >
-
-        <Button
+       <Button
             android:id="@+id/btn_take_photo_ok"
             android:layout_width="@dimen/photo_preview_ok_btn_Width"
             android:layout_height="@dimen/photo_preview_ok_btn_Heigth"

@@ -29,4 +29,5 @@
     <color name="vi_alertDialog_clBtn_press_color">#ffaaaaaa</color>
     <color name="comp_child_buttons_color">#ff0099cc</color>
     <color name="comp_button_color">#ff0099cc</color>
+    <color name="crop_image_layout_bk">#3C3C3C</color>
 </resources>

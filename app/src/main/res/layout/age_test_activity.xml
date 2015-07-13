@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"/>
         <!-- 圆形进度等待动画-->
-        <com.kairong.circleProgress.CircleProgress
+        <com.kairong.viUIControls.circleProgress.CircleProgress
             android:id="@+id/age_test_image_progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
             android:id="@+id/age_test_mascot"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:background="@drawable/octopus"/>
+            android:background="@mipmap/octopus"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

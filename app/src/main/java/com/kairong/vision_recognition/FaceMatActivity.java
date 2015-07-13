@@ -2,41 +2,29 @@ package com.kairong.vision_recognition;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.Size;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kairong.viAlertDialog.viHintDialog;
-import com.kairong.viCamera.viCameraActivity;
-import com.kairong.circleProgress.CircleProgress;
-import com.kairong.horizonListView.HorizontalListView;
-import com.kairong.horizonListView.HorizontalListViewAdapter;
-import com.kairong.viAlertDialog.viAlertDialog;
+import com.kairong.viUIControls.viAlertDialog.viHintDialog;
+import com.kairong.viUIControls.viCamera.viCameraActivity;
+import com.kairong.viUIControls.circleProgress.CircleProgress;
+import com.kairong.viUIControls.horizonListView.HorizontalListView;
+import com.kairong.viUIControls.horizonListView.HorizontalListViewAdapter;
+import com.kairong.viUIControls.viAlertDialog.viAlertDialog;
 import com.kairong.viUtils.BitmapUtil;
 import com.kairong.viUtils.CameraUtil;
 import com.kairong.viUtils.DisplayUtil;
-import com.kairong.viUtils.viSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +33,7 @@ import java.util.Vector;
 /**
  * Created by Kairong on 2015/6/3.
  * mail:wangkrhust@gmail.com
+ * blog:http://blog.csdn.net/wangkr111
  */
 public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnclickInterface{
     private viApplication app = null;
