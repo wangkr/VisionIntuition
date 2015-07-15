@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="vi_red_color">#ffff4444</color>
+    <color name="vi_green_color">#ff99cc00</color>
+    <color name="vi_blue_color">#ff0099cc</color>
     <color name="activity_background_color">#6ABD78</color>
     <color name="text_title_color">#3BAF36</color>
     <color name="camer_open_button_color">#ffff4444</color>
     <color name="gallery_open_button_color">#ff99cc00</color>
-    <color name="camer_open_button_press_color">#FF683d</color>
-    <color name="gallery_open_button_press_color">#96c96b</color>
-    <color name="auto_activity_background_color">#3BAF36</color>
     <color name="select_image_button_bk_color">#55FFFFFF</color>
     <color name="select_image_button_press_color">#22FFFFFF</color>
+    <color name="gallery_open_button_press_color">#96c96b</color>
+    <color name="auto_activity_background_color">#3BAF36</color>
     <color name="fm_right_face_bkcolor">#66009966</color>
     <color name="fm_left_face_bkcolor">#667fc13f</color>
     <color name="hList_right_face_item_bk_color">#009966</color>
@@ -16,9 +18,7 @@
     <color name="semitransparent_color">#50FFFFFF</color>
     <color name="cutLine_color">#88FFFFFF</color>
     <color name="face_similarity_background_color">#83ca759f</color>
-    <color name="take_photo_OK_button_press_color">#282828</color>
-    <color name="take_photo_OK_button_color">#656565</color>
-    <color name="take_photo_toolbar_color">#000000</color>
+    <color name="take_photo_toolbar_color">#001320</color>
     <color name="vi_alertDialog_bk_color">#995dd0ff</color>
     <color name="vi_alertDialog_bar_color">#42a5ce</color>
     <color name="vi_alertDialog_cmBtn_color">#ffff4444</color>
@@ -30,4 +30,5 @@
     <color name="comp_child_buttons_color">#ff0099cc</color>
     <color name="comp_button_color">#ff0099cc</color>
     <color name="crop_image_layout_bk">#3C3C3C</color>
+    <color name="text_btn_bg_press_color">#880099cc</color>
 </resources>

@@ -153,7 +153,7 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
                 break;
         }
         Intent imgIntent = new Intent(FaceMatActivity.this, viCameraActivity.class);
-        imgIntent.putExtra("SrcTag", TAG);
+        imgIntent.putExtra("OriginTag", TAG);
         startActivityForResult(imgIntent, CAMERA_TOUCH_IMAGE_CODE);
     }
     public void onSelectLImage(View view){
@@ -234,7 +234,7 @@ public class FaceMatActivity extends Activity implements viHintDialog.IDialogOnc
 
     /**
      * 更新Face Image View图片
-     * @param requestCode
+     * @param requestCode 
      * @param data
      */
     private void updateFaceImageView(int requestCode,Intent data){

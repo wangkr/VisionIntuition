@@ -14,17 +14,16 @@ import com.kairong.viUtils.DisplayUtil;
  * blog:http://blog.csdn.net/wangkr111
  */
 public class WelcomeActivity extends Activity {
-    private viApplication app;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        app = (viApplication)getApplication();
+        viApplication.viApp = (viApplication)getApplication();
         // 获取设备屏幕信息
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-        app.setScreenWidth(dm.widthPixels);   // 屏幕宽
-        app.setScreenHeight(dm.heightPixels); // 屏幕高
+        viApplication.viApp.setScreenWidth(dm.widthPixels);   // 屏幕宽
+        viApplication.viApp.setScreenHeight(dm.heightPixels); // 屏幕高
 
 
         DisplayUtil.scaledDensity = dm.scaledDensity;
@@ -40,13 +39,13 @@ public class WelcomeActivity extends Activity {
         CamTargetList.addTargetClass(TextCovtActivity.class,"TextCovtActivity");
 
         // 初试BimapUtil信息
-        if(app.getScreenHeight()>app.getScreenWidth()){
-            app.setIMAGE_LOAD_IN_MEM_MAX_WIDTH(app.getScreenHeight());
+        if(viApplication.viApp.getScreenHeight()>viApplication.viApp.getScreenWidth()){
+            viApplication.viApp.setIMAGE_LOAD_IN_MEM_MAX_WIDTH(viApplication.viApp.getScreenHeight());
         }else{
-            app.setIMAGE_LOAD_IN_MEM_MAX_WIDTH(app.getScreenWidth());
+            viApplication.viApp.setIMAGE_LOAD_IN_MEM_MAX_WIDTH(viApplication.viApp.getScreenWidth());
         }
-        app.setIMAGE_LOAD_IN_MEM_MAX_SIZE(app.getScreenHeight()*app.getScreenWidth());
-
+        viApplication.viApp.setIMAGE_LOAD_IN_MEM_MAX_SIZE(viApplication.viApp.getScreenHeight()*viApplication.viApp.getScreenWidth());
+        // 设置应用的图片宽高比
         Intent newint = new Intent();
         newint.setClass(this, MainActivity.class);
         startActivity(newint);

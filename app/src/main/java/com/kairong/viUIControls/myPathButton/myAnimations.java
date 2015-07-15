@@ -97,7 +97,6 @@ public class myAnimations {
 		composerBtnRect = new Rect();
 		
 		composerRect.top = app.getScreenHeight()/2 + (app.getMain_1_btn_size()/2);
-		Log.d(TAG,"ScreenHeight"+app.getScreenHeight());
 		composerRect.left = app.getActivity_horizontal_margin();
 		composerRect.bottom = app.getScreenHeight() - app.getActivity_vertical_margin();
 		composerRect.right = app.getScreenWidth() - app.getActivity_horizontal_margin();

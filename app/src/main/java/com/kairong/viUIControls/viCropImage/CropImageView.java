@@ -13,6 +13,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.kairong.vision_recognition.R;
+import com.kairong.vision_recognition.viApplication;
+
 /**
  * Created by Kairong on 2015/7/13 at USTC
  * mail:wangkrhust@gmail.com
@@ -31,6 +34,9 @@ public class CropImageView extends View {
     // 默认裁剪的宽高
     private int cropWidth;
     private int cropHeight;
+    // 底层Drawable宽高
+    private int srcDrawableWidth;
+    private int srcDrawableHeight;
     // 浮层Drawable的四个点
     private final int EDGE_LT = 1;
     private final int EDGE_RT = 2;
@@ -43,6 +49,8 @@ public class CropImageView extends View {
     public int currentEdge = EDGE_NONE;
 
     protected float oriRationWH = 0;
+    protected float fixedWHratio = -1;
+    protected float srcDrawableWHratio = -1;
     protected final float maxZoomOut = 5.0f;
     protected final float minZoomIn = 0.333333f;
 
@@ -54,6 +62,7 @@ public class CropImageView extends View {
     protected Rect mDrawableFloat = new Rect();// 浮层的Rect
     protected boolean isFrist = true;
     private boolean isTouchInSquare = true;
+    protected boolean ifFixedWHratio = false;
 
     protected Context mContext;
 
@@ -86,11 +95,17 @@ public class CropImageView extends View {
         mFloatDrawable = new FloatDrawable(context);
     }
 
+    public void setIfFixedWHratio(boolean ifFixedWHratio){
+        this.ifFixedWHratio = ifFixedWHratio;
+    }
+
     public void setDrawable(Drawable mDrawable, int cropWidth, int cropHeight) {
         this.mDrawable = mDrawable;
         this.cropWidth = cropWidth;
         this.cropHeight = cropHeight;
         this.isFrist = true;
+        this.fixedWHratio = (float)cropWidth/cropHeight;
+
         invalidate();
     }
 
@@ -121,7 +136,6 @@ public class CropImageView extends View {
                 currentEdge = getTouch((int) mX_1, (int) mY_1);
                 isTouchInSquare = mDrawableFloat.contains((int) event.getX(),
                         (int) event.getY());
-
                 break;
 
             case MotionEvent.ACTION_UP:
@@ -138,39 +152,65 @@ public class CropImageView extends View {
                 } else if (mStatus == STATUS_SINGLE) {
                     int dx = (int) (event.getX() - mX_1);
                     int dy = (int) (event.getY() - mY_1);
-
                     mX_1 = event.getX();
                     mY_1 = event.getY();
-                    // 根據得到的那一个角，并且变换Rect
+
+                    // 根据得到的那一个角，并且变换Rect
                     if (!(dx == 0 && dy == 0)) {
+                        int abs_dx = Math.abs(dx),abs_dy = Math.abs(dy);
+                        // 固定比例变换的delta x y 的值
+                        int fixed_dy = Math.round(abs_dx/fixedWHratio);
+                        int fixed_dx = Math.round(abs_dy*fixedWHratio);
+                        int dx_tmp = fixed_dx - abs_dx,dy_tmp = fixed_dy - abs_dy;
+                        int dL = 0,dT = 0,dR = 0,dB = 0;
                         switch (currentEdge) {
                             case EDGE_LT:
-                                mDrawableFloat.set(mDrawableFloat.left + dx,
-                                        mDrawableFloat.top + dy, mDrawableFloat.right,
-                                        mDrawableFloat.bottom);
+                                dL = dx;dT = dy;
+                                if(ifFixedWHratio){
+                                    dB = fixed_dy>abs_dy?(dy>=0?(dx>=0?-dy_tmp:abs_dy+fixed_dy):(dx>=0?-(abs_dy+fixed_dy):dy_tmp)):0;
+                                    dR = fixed_dx>abs_dx?(dx>=0?(dy>=0?-dx_tmp:abs_dx+fixed_dx):(dy>=0?-(abs_dx+fixed_dx):dx_tmp)):0;
+                                }
+                                mDrawableFloat.set(mDrawableFloat.left + dL,
+                                        mDrawableFloat.top + dT, mDrawableFloat.right + dR,
+                                        mDrawableFloat.bottom + dB);
                                 break;
 
                             case EDGE_RT:
-                                mDrawableFloat.set(mDrawableFloat.left,
-                                        mDrawableFloat.top + dy, mDrawableFloat.right
-                                                + dx, mDrawableFloat.bottom);
+                                dR = dx;dT = dy;
+                                if(ifFixedWHratio){
+                                    dB = fixed_dy>abs_dy?(dy>=0?(dx>=0?abs_dy+fixed_dy:-dy_tmp):(dx>=0?dy_tmp:-(abs_dy+fixed_dy))):0;
+                                    dL = fixed_dx>abs_dx?(dx>=0?(dy>=0?abs_dx+fixed_dx:-dx_tmp):(dy>=0?abs_dx:-(abs_dx+fixed_dx))):0;
+                                }
+                                mDrawableFloat.set(mDrawableFloat.left + dL,
+                                        mDrawableFloat.top + dT, mDrawableFloat.right + dR,
+                                        mDrawableFloat.bottom + dB);
                                 break;
 
                             case EDGE_LB:
-                                mDrawableFloat.set(mDrawableFloat.left + dx,
-                                        mDrawableFloat.top, mDrawableFloat.right,
-                                        mDrawableFloat.bottom + dy);
+                                dL = dx;dB = dy;
+                                if(ifFixedWHratio){
+                                    dT = fixed_dy>abs_dy?(dy>=0?(dx>=0?abs_dy+fixed_dy:-dy_tmp):(dx>=0?dy_tmp:-(abs_dy+fixed_dy))):0;
+                                    dR = fixed_dx>abs_dx?(dx>=0?(dy>=0?abs_dx+fixed_dx:-dx_tmp):(dy>=0?dx_tmp:-(abs_dx+fixed_dx))):0;
+                                }
+                                mDrawableFloat.set(mDrawableFloat.left + dL,
+                                        mDrawableFloat.top + dT, mDrawableFloat.right + dR,
+                                        mDrawableFloat.bottom + dB);
                                 break;
 
                             case EDGE_RB:
-                                mDrawableFloat.set(mDrawableFloat.left,
-                                        mDrawableFloat.top, mDrawableFloat.right + dx,
-                                        mDrawableFloat.bottom + dy);
+                                dR = dx;dB = dy;
+                                if(ifFixedWHratio){
+                                    dT = fixed_dy>abs_dy?(dy>=0?(dx>=0?-dy_tmp:abs_dy+fixed_dy):(dx>=0?-(abs_dy+fixed_dy):dy_tmp)):0;
+                                    dL = fixed_dx>abs_dx?(dx>=0?(dy>=0?-dx_tmp:abs_dx+fixed_dx):(dy>=0?-(abs_dx+fixed_dx):dx_tmp)):0;
+                                }
+                                mDrawableFloat.set(mDrawableFloat.left + dL,
+                                        mDrawableFloat.top + dT, mDrawableFloat.right + dR,
+                                        mDrawableFloat.bottom + dB);
                                 break;
 
                             case EDGE_MOVE_IN:
                                 if (isTouchInSquare) {
-                                    mDrawableFloat.offset((int) dx, (int) dy);
+                                    mDrawableFloat.offset(dx, dy);
                                 }
                                 break;
 
@@ -236,13 +276,13 @@ public class CropImageView extends View {
         }
 
         configureBounds();
-        // 在画布上花图片
+        // 在画布上画图片
         mDrawable.draw(canvas);
         canvas.save();
         // 在画布上画浮层FloatDrawable,Region.Op.DIFFERENCE是表示Rect交集的补集
         canvas.clipRect(mDrawableFloat, Region.Op.DIFFERENCE);
         // 在交集的补集上画上灰色用来区分
-        canvas.drawColor(Color.parseColor("#a0000000"));
+        canvas.drawColor(Color.parseColor("#a00099cc"));
         canvas.restore();
         // 画浮层
         mFloatDrawable.draw(canvas);
@@ -261,6 +301,11 @@ public class CropImageView extends View {
                     * scale + 0.5f));
             int h = (int) (w / oriRationWH);
 
+            srcDrawableWidth = w;
+            srcDrawableHeight = h;
+
+            srcDrawableWHratio = (float)srcDrawableWidth/srcDrawableHeight;
+
             int left = (getWidth() - w) / 2;
             int top = (getHeight() - h) / 2;
             int right = left + w;
@@ -269,18 +314,8 @@ public class CropImageView extends View {
             mDrawableSrc.set(left, top, right, bottom);
             mDrawableDst.set(mDrawableSrc);
 
-            int floatWidth = dipTopx(mContext, cropWidth);
-            int floatHeight = dipTopx(mContext, cropHeight);
-
-            if (floatWidth > getWidth()) {
-                floatWidth = getWidth();
-                floatHeight = cropHeight * floatWidth / cropWidth;
-            }
-
-            if (floatHeight > getHeight()) {
-                floatHeight = getHeight();
-                floatWidth = cropWidth * floatHeight / cropHeight;
-            }
+            int floatWidth = cropWidth;
+            int floatHeight = cropHeight;
 
             int floatLeft = (getWidth() - floatWidth) / 2;
             int floatTop = (getHeight() - floatHeight) / 2;
@@ -293,39 +328,86 @@ public class CropImageView extends View {
         mDrawable.setBounds(mDrawableDst);
         mFloatDrawable.setBounds(mDrawableFloat);
     }
-
     // 在up事件中调用了该方法，目的是检查是否把浮层拖出了屏幕
     protected void checkBounds() {
         int newLeft = mDrawableFloat.left;
         int newTop = mDrawableFloat.top;
 
+
         boolean isChange = false;
-        if (mDrawableFloat.left < getLeft()) {
-            newLeft = getLeft();
+        if (mDrawableFloat.left < mDrawableSrc.left) {
+            newLeft = mDrawableSrc.left;
             isChange = true;
         }
 
-        if (mDrawableFloat.top < getTop()) {
-            newTop = getTop();
+        if (mDrawableFloat.top < mDrawableSrc.top) {
+            newTop = mDrawableSrc.top;
             isChange = true;
         }
 
-        if (mDrawableFloat.right > getRight()) {
-            newLeft = getRight() - mDrawableFloat.width();
+        if (mDrawableFloat.right > mDrawableSrc.right) {
+            newLeft = mDrawableSrc.right - mDrawableFloat.width();
             isChange = true;
         }
 
-        if (mDrawableFloat.bottom > getBottom()) {
-            newTop = getBottom() - mDrawableFloat.height();
+        if (mDrawableFloat.bottom > mDrawableSrc.bottom) {
+            newTop = mDrawableSrc.bottom - mDrawableFloat.height();
             isChange = true;
         }
+        // 超出大小则重新绘制
+        if(mDrawableFloat.width()>mDrawableSrc.width()||mDrawableFloat.height()>mDrawableSrc.height()){
+            int left = (getWidth() - srcDrawableWidth) / 2;
+            int top = (getHeight() - srcDrawableHeight) / 2;
+            int right = left + srcDrawableWidth;
+            int bottom = top + srcDrawableHeight;
 
-        mDrawableFloat.offsetTo(newLeft, newTop);
+            mDrawableSrc.set(left, top, right, bottom);
+            mDrawableDst.set(mDrawableSrc);
+
+            int floatWidth = cropWidth;
+            int floatHeight = cropHeight;
+
+            int floatLeft = (getWidth() - floatWidth) / 2;
+            int floatTop = (getHeight() - floatHeight) / 2;
+            mDrawableFloat.set(floatLeft, floatTop, floatLeft + floatWidth,
+                    floatTop + floatHeight);
+            isChange = true;
+        }else {
+            mDrawableFloat.offsetTo(newLeft, newTop);
+        }
         if (isChange) {
             invalidate();
         }
     }
 
+    public void refreshDrawable(float crop_wh_ratio){
+        fixedWHratio = crop_wh_ratio;
+
+        if(fixedWHratio>=srcDrawableWHratio){
+            cropWidth = srcDrawableWidth;
+            cropHeight = (int)(cropWidth / fixedWHratio);
+        } else {
+            cropHeight = srcDrawableHeight;
+            cropWidth = (int)(cropHeight*fixedWHratio);
+        }
+
+        int left = (getWidth() - srcDrawableWidth) / 2;
+        int top = (getHeight() - srcDrawableHeight) / 2;
+        int right = left + srcDrawableWidth;
+        int bottom = top + srcDrawableHeight;
+
+        mDrawableSrc.set(left, top, right, bottom);
+        mDrawableDst.set(mDrawableSrc);
+
+        int floatWidth = cropWidth;
+        int floatHeight = cropHeight;
+
+        int floatLeft = (getWidth() - floatWidth) / 2;
+        int floatTop = (getHeight() - floatHeight) / 2;
+        mDrawableFloat.set(floatLeft, floatTop, floatLeft + floatWidth,
+                floatTop + floatHeight);
+        invalidate();
+    }
     // 进行图片的裁剪，所谓的裁剪就是根据Drawable的新的坐标在画布上创建一张新的图片
     public Bitmap getCropImage() {
         Bitmap tmpBitmap = Bitmap.createBitmap(getWidth(), getHeight(),

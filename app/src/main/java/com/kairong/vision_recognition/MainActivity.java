@@ -68,6 +68,7 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,viCameraActivity.class);
                 intent.putExtra("DestTag", "AutoRecgActivity");
+                intent.putExtra("ifCrop",true);
                 startActivity(intent);
             }
         });

@@ -22,10 +22,24 @@
     <!-- viCameraActivity(take_photo_activity)-->
     <dimen name="photo_preview_ok_btn_Width">64dp</dimen>
     <dimen name="photo_preview_ok_btn_Heigth">40dp</dimen>
+    <dimen name="crop_ratio_btn_width">46dp</dimen>
+    <dimen name="crop_ratio_btn_height">28dp</dimen>
+    <dimen name="layout_bar_vPadding">20dp</dimen>
+    <dimen name="layout_bar_hPadding">20dp</dimen>
     <dimen name="photo_preview_ok_btnTextSize">18sp</dimen>
     <dimen name="photo_preview_bar_height">64dp</dimen>
     <dimen name="shutter_btn_size">56dp</dimen>
     <dimen name="focus_image_size">128dp</dimen>
+    <dimen name="take_photo_2_btn_width">48dp</dimen>
+    <dimen name="take_photo_2_btn_height">36dp</dimen>
+    <dimen name="crop_drop_down_list_width">80dp</dimen>
+    <dimen name="icn_triangle_size">8dp</dimen>
+    <dimen name="icn_triangle_margin">5dp</dimen>
+    <!-- crop_wh_ratio_vlist-->
+    <dimen name="crop_vlist_image_size">24dp</dimen>
+    <dimen name="crop_vlist_text_size">14sp</dimen>
+    <dimen name="crop_vlist_item_margin">5dp</dimen>
+    <dimen name="crop_vlist_text_start_margin">8dp</dimen>
     <!-- CropImageActivity(crop_image_activity)-->
     <dimen name="cropImage_title_size">24sp</dimen>
     <!-- Horizontal list view-->

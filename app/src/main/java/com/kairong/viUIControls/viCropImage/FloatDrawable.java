@@ -20,13 +20,13 @@ public class FloatDrawable extends Drawable {
     private Paint mLinePaint2 = new Paint();
     {
         mLinePaint.setARGB(200, 50, 50, 50);
-        mLinePaint.setStrokeWidth(1F);
+        mLinePaint.setStrokeWidth(4F);
         mLinePaint.setStyle(Paint.Style.STROKE);
         mLinePaint.setAntiAlias(true);
         mLinePaint.setColor(Color.rgb(0x33,0xb5,0xe5));
         //
         mLinePaint2.setARGB(200, 50, 50, 50);
-        mLinePaint2.setStrokeWidth(7F);
+        mLinePaint2.setStrokeWidth(10F);
         mLinePaint2.setStyle(Paint.Style.STROKE);
         mLinePaint2.setAntiAlias(true);
         mLinePaint2.setColor(Color.rgb(0x33,0xb5,0xe5));

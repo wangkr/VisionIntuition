@@ -13,9 +13,6 @@
         android:theme="@style/AppTheme"
         android:name=".viApplication">
         <activity
-            android:name="com.kairong.viUIControls.viCamera.viCameraActivity">
-        </activity>
-        <activity
             android:name=".MainActivity"
             android:theme="@android:style/Theme.NoTitleBar">
         </activity>
@@ -33,6 +30,10 @@
         </activity>
         <activity
             android:name=".TextCovtActivity"
+            android:theme="@android:style/Theme.NoTitleBar">
+        </activity>
+        <activity
+            android:name="com.kairong.viUIControls.viCamera.viCameraActivity"
             android:theme="@android:style/Theme.NoTitleBar">
         </activity>
         <activity android:name=".WelcomeActivity"

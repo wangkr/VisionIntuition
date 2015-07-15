@@ -15,7 +15,8 @@
     <string name="btn_face_match_text">开始匹配</string>
     <string name="btn_text_conversion_text">文字识别</string>
     <string name="btn_ar_share_text">分享</string>
-    <string name="cropImage_title">图片裁剪</string>
+    <string name="cropImage_title">照片裁剪</string>
+    <string name="storeImage_title">照片存储</string>
     <string name="last_step">上一步</string>
     <string name="next_step">下一步</string>
     <string name="done_text">完成</string>

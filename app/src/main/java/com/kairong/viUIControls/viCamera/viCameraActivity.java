@@ -8,16 +8,20 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
@@ -26,14 +30,25 @@ import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PictureCallback;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kairong.sensorDetector.ScrnOrientDetector;
 import com.kairong.viUIControls.viCropImage.CropImageView;
-import com.kairong.viUIControls.viCropImage.viCropImageActivity;
+import com.kairong.viUtils.BitmapUtil;
 import com.kairong.vision_recognition.R;
 import com.kairong.sensorDetector.ShakeDetector;
 import com.kairong.vision_recognition.viApplication;
@@ -44,30 +59,39 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Kairong on 2015/5/27.
  * mail:wangkrhust@gmail.com
  */
 public class viCameraActivity extends Activity implements SurfaceHolder.Callback {
-
-    private String TAG = "viCameraActivity";
+    private viApplication app;
     private SurfaceView surface = null;
-    private Camera camera = null;                   // 声明相机
-    private int cameraPosition = 1;                 // 0代表前置摄像头，1代表后置摄像头
+    private Camera camera = null;                       // 声明相机
+    private int cameraPosition = 1;                     // 0代表前置摄像头，1代表后置摄像头
     private int srcnOrient = 0;
     private int picRotationDegree = 0;
+    private CropImageView cropImageView = null;         // 裁剪图片View
     private SurfaceHolder holder = null;
-    private ImageView focus_View = null;            // 显示对焦光标
-    private ImageView imageView_photo_preview = null; // 显示拍照后的预览图片
+    private ImageView focus_View = null;                // 显示对焦光标
+    private ImageView imageView_photo_preview = null;   // 显示拍照后的预览图片
+    private TextView  crop_wh_ratio_text = null;        // 显示当前裁剪的宽高比
+    // 各个相对布局的引用
     private RelativeLayout take_photo_bar_rl = null;
     private RelativeLayout preview_photo_rl  = null;
+    private RelativeLayout crop_photo_rl = null;
+    private ListView crop_wh_ratio_drop_down_listView = null;
     private Bitmap saved_photo = null;
     private Parameters previewParameters = null;
     private Class originActivity = null;
     private Class destActivity = null;
     private Thread myAFthread = null;                   // 自动对焦监测线程
+    private File storeFileDir = null;
     // 晃动检测器—用于检测摄像头剧烈晃动，从而启动自动聚焦
     private ShakeDetector shakeDetector = null;
     // 屏幕方向检测器，用于监测屏幕的旋转
@@ -75,10 +99,14 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     private boolean isPreviewing = false;
     private boolean isFocused = false;
     private boolean ifStopAFthread = false;
+    private boolean ifCrop = false;
+    private boolean cropvlist_visible = false;
 
     /*存储的图片尺寸*/
     private int storeImageWidth = 0;
     private int storeImageHeight = 0;
+    /*裁剪宽高比*/
+    private float crop_wh_ratio;
 
     private final static int MSG_FOCUSED = 3235;
     private final static int MSG_FOCUS_FAILED = 3236;
@@ -92,14 +120,22 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     public static final int ORIENTATION_REV_LAND = 180;
     /*反方向竖直方向*/
     public static final int ORIENTATION_REV_PORTRAIT = -90;
+
+    private final String TAG = "viCameraActivity";
+    private final static String[] vlist_text = new String[]{"9:16","16:9","3:4","4:3","2:3","3:2"};
+
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        app = (viApplication)getApplication();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.take_photo_activity);
-        String srcTag = getIntent().getStringExtra("SrcTag");
+        // 获取跳转Activity class 引用
+        String originTag = getIntent().getStringExtra("OriginTag");
         String destTag  =getIntent().getStringExtra("DestTag");
-        originActivity = CamTargetList.getTargetClass(srcTag);
+        originActivity = CamTargetList.getTargetClass(originTag);
         destActivity = CamTargetList.getTargetClass(destTag);
+        // 是否进行裁剪
+        ifCrop = getIntent().getBooleanExtra("ifCrop",false);
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);//拍照过程屏幕一直处于高亮
@@ -114,6 +150,9 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         ImageView btn_shutter = (ImageView)findViewById(R.id.btn_take_photo);
         Button btn_take_photo_ok = (Button)findViewById(R.id.btn_take_photo_ok);
         Button btn_take_photo_cancell = (Button)findViewById(R.id.btn_take_photo_cancell);
+        Button btn_crop_cancell = (Button)findViewById(R.id.btn_crop_cancell);
+        Button btn_crop_done = (Button)findViewById(R.id.btn_crop_done);
+        crop_wh_ratio_text = (TextView)findViewById(R.id.crop_wh_ratio_text);
         surface = (SurfaceView)findViewById(R.id.surfaceview);
         focus_View = (ImageView)findViewById(R.id.focus);
         holder = surface.getHolder();//获得句柄
@@ -121,12 +160,30 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);//surfaceview不维护自己的缓冲区，等待屏幕渲染引擎将内容推送到用户面前
         take_photo_bar_rl = (RelativeLayout)findViewById(R.id.take_photo_bar_layout);
         preview_photo_rl = (RelativeLayout)findViewById(R.id.preview_photo_layout);
+        crop_photo_rl = (RelativeLayout)findViewById(R.id.crop_photo_layout);
+        RelativeLayout crop_wh_ratio_btn_rl = (RelativeLayout)findViewById(R.id.crop_wh_ratio_btn_layout);
+        cropImageView = (CropImageView)findViewById(R.id.crop_image_view);
+        crop_wh_ratio_drop_down_listView = (ListView)findViewById(R.id.crop_wh_ratio_drop_down_list);
         // 设置控件监听
-        btn_shutter.setOnClickListener(listener);
-        btn_camera_change.setOnClickListener(listener);
-        btn_gallery.setOnClickListener(listener);
-        btn_take_photo_cancell.setOnClickListener(listener);
-        btn_take_photo_ok.setOnClickListener(listener);
+        btn_shutter.setOnClickListener(gl_listener);
+        btn_camera_change.setOnClickListener(gl_listener);
+        btn_gallery.setOnClickListener(gl_listener);
+        btn_take_photo_cancell.setOnClickListener(gl_listener);
+        btn_take_photo_ok.setOnClickListener(gl_listener);
+        btn_crop_cancell.setOnClickListener(gl_listener);
+        btn_crop_done.setOnClickListener(gl_listener);
+        crop_wh_ratio_btn_rl.setOnClickListener(gl_listener);
+
+        SimpleAdapter adapter = new SimpleAdapter(this,getData(),R.layout.crop_wh_ratio_vlist,new String[] {"vlist_image","vlist_text"},new int[] {R.id.vlist_image,R.id.vlist_text});
+        crop_wh_ratio_drop_down_listView.setAdapter(adapter);
+        crop_wh_ratio_drop_down_listView.setOnItemClickListener(onItemClickListener);
+        // 照片固定的比例进行裁剪,默认16:9
+        crop_wh_ratio = viApplication.viApp.getCROP_PHOTO_WH_RATIO("16:9");
+
+        storeFileDir = new File(Environment.getExternalStorageDirectory(), "VisionIntuition");
+        if (!storeFileDir.exists()) {
+            storeFileDir.mkdir();
+        }
     }
 
     /**
@@ -183,7 +240,20 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
             }
         }
     };
-    OnClickListener listener = new OnClickListener() {
+    AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            float cur_crop_wh_ratio = viApplication.viApp.getCROP_PHOTO_WH_RATIO(vlist_text[position]);
+            crop_wh_ratio_set();
+            crop_wh_ratio_text.setText(vlist_text[position]);
+            if(cur_crop_wh_ratio!=crop_wh_ratio){
+                cropImageView.refreshDrawable(cur_crop_wh_ratio);
+                crop_wh_ratio = cur_crop_wh_ratio;
+            }
+        }
+    };
+    // 全局按钮控件监听
+    OnClickListener gl_listener = new OnClickListener() {
         @Override
         public void onClick(View v) {
 
@@ -211,10 +281,39 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                     // 丢弃照片
                     discardPhoto();
                     break;
+                case R.id.btn_crop_cancell:
+                    // 丢弃照片
+                    discardPhoto();
+                    break;
+                case R.id.btn_crop_done:
+                    // 存储照片
+                    storePhoto();
+                    break;
+                case R.id.crop_wh_ratio_btn_layout:
+                    crop_wh_ratio_set();
+                    break;
             }
         }
     };
 
+    // 得到裁剪宽高比选项菜单内容
+    private List<Map<String,Object>> getData(){
+        List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+
+        int[] vlist_image = new int[]{R.drawable.w9h16_icn,R.drawable.w16h9_icn,R.drawable.w3h4_icn,
+                                        R.drawable.w4h3_icn,R.drawable.w3h2_icn,R.drawable.w2h3_icn};
+
+        Map<String,Object> map = null;
+        for(int i = 0;i < vlist_image.length;i++){
+            map = new HashMap<String,Object>();
+            map.put("vlist_image",vlist_image[i]);
+            map.put("vlist_text",vlist_text[i]);
+            list.add(map);
+        }
+
+        return list;
+
+    }
     AutoFocusCallback autoFocusCallback = new AutoFocusCallback(){
 
         @Override
@@ -270,15 +369,18 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         //当surfaceview关闭时，先停止自动对焦线程，再关闭预览并释放资源
         // 停止线程
         ifStopAFthread = true;
-        myAFthread.interrupt();
-        myAFthread = null;
+        if(myAFthread!=null) {
+            myAFthread.interrupt();
+            myAFthread = null;
+        }
         // 置预览回调为空，再关闭预览
-        camera.setPreviewCallback(null);
-        camera.stopPreview();
-        camera.release();
-        camera = null;
-        isPreviewing = false;
-
+        if(camera!=null) {
+            camera.setPreviewCallback(null);
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+            isPreviewing = false;
+        }
         // 最后关掉震动检测器和自动对焦
         shakeDetector.stop();
         scrnOrientDetector.stop();
@@ -364,6 +466,98 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         }
     }
 
+    /**
+     * 裁剪处理
+     */
+    private void cropPhoto(){
+        // 显示preview_photo_layout
+        {
+            take_photo_bar_rl.setVisibility(View.INVISIBLE);
+            focus_View.setVisibility(View.INVISIBLE);
+        }
+        int cropWidth,cropHeight;
+        Log.d(TAG,""+crop_wh_ratio);
+        int srcWidth = saved_photo.getWidth(),srcHeight = saved_photo.getHeight();
+        float srcWHratio = (float)srcWidth/srcHeight;
+        if(srcWHratio>=1){
+            crop_wh_ratio = crop_wh_ratio > 1?crop_wh_ratio:1/crop_wh_ratio;
+        } else {
+            crop_wh_ratio = crop_wh_ratio < 1?crop_wh_ratio:1/crop_wh_ratio;
+        }
+        if(crop_wh_ratio>=srcWHratio){
+            cropWidth = srcWidth;
+            cropHeight = (int)(cropWidth / crop_wh_ratio);
+        } else {
+            cropHeight = srcHeight;
+            cropWidth = (int)(cropHeight * crop_wh_ratio);
+        }
+        // 设置固定宽高比值
+        cropImageView.setIfFixedWHratio(true);
+        cropImageView.setDrawable(new BitmapDrawable(saved_photo), cropWidth, cropHeight);
+        crop_photo_rl.setVisibility(View.VISIBLE);
+    }
+
+    // 设置裁剪宽高比
+    private void crop_wh_ratio_set(){
+        if(!cropvlist_visible){
+            Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0f,
+                    Animation.RELATIVE_TO_SELF,0f,
+                    Animation.RELATIVE_TO_SELF,-1.0f,
+                    Animation.RELATIVE_TO_SELF,0f);
+            animation.setInterpolator(new DecelerateInterpolator());
+            animation.setDuration(500);
+            final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(crop_wh_ratio_drop_down_listView.getLayoutParams());
+            int left = viApplication.viApp.getScreenWidth() - (int)(getResources().getDimension(R.dimen.crop_drop_down_list_width));
+            int top = (int)(getResources().getDimension(R.dimen.photo_preview_bar_height));
+            layoutParams.setMargins(left, top, 0, 0);
+            crop_wh_ratio_drop_down_listView.startAnimation(animation);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    crop_wh_ratio_drop_down_listView.setLayoutParams(layoutParams);
+                    crop_wh_ratio_drop_down_listView.setVisibility(View.VISIBLE);
+                    crop_wh_ratio_drop_down_listView.clearAnimation();
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            cropvlist_visible = true;
+        }else {
+            Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0f,
+                    Animation.RELATIVE_TO_SELF,0f,
+                    Animation.RELATIVE_TO_SELF,0f,
+                    Animation.RELATIVE_TO_SELF,-1f);
+            animation.setInterpolator(new DecelerateInterpolator());
+            animation.setDuration(500);
+            crop_wh_ratio_drop_down_listView.startAnimation(animation);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    crop_wh_ratio_drop_down_listView.clearAnimation();
+                    crop_wh_ratio_drop_down_listView.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            crop_wh_ratio_drop_down_listView.setVisibility(View.INVISIBLE);
+            cropvlist_visible = false;
+        }
+    }
     // 创建jpeg图片回调数据对象
     PictureCallback jpeg = new PictureCallback() {
         @Override
@@ -373,11 +567,28 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                 saved_photo = BitmapFactory.decodeByteArray(data,0,data.length);
                 camera.stopPreview();
                 isPreviewing = false;
-                // 显示preview_photo_layout
-                take_photo_bar_rl.setVisibility(View.INVISIBLE);
-                preview_photo_rl.setVisibility(View.VISIBLE);
-                focus_View.setVisibility(View.INVISIBLE);
-                imageView_photo_preview.setImageBitmap(saved_photo);
+                // 先对图片进行旋转处理
+                {
+                    // 后置摄像头对照片进行顺时针旋转90度，前置摄像头则逆时针转90度
+                    Matrix matRotate = new Matrix();
+                    if (cameraPosition == 0) {
+                        matRotate.setRotate(-picRotationDegree);
+                    } else {
+                        matRotate.setRotate(picRotationDegree);
+                    }
+                    // 再对图片进行初步剪切
+                    int h = 0, w = (int)(getResources().getDimension(R.dimen.photo_preview_bar_height));
+                    saved_photo = Bitmap.createBitmap(saved_photo, w, h, storeImageWidth, storeImageHeight, null, true);
+                    // 再进行旋转
+                    saved_photo = Bitmap.createBitmap(saved_photo, 0, 0, saved_photo.getWidth(), saved_photo.getHeight(), matRotate, true);
+                }
+                // 是否裁剪图片
+                if(ifCrop) {
+                    cropPhoto();
+                }else {
+                    preview_photo_rl.setVisibility(View.VISIBLE);
+                    imageView_photo_preview.setImageBitmap(saved_photo);
+                }
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -389,35 +600,15 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
      */
     private void storePhoto(){
         try {
-            File filedir = new File(Environment.getExternalStorageDirectory(), "VisionIntuition");
-            if (!filedir.exists()) {
-                filedir.mkdir();
-            }
-            String filepath = filedir.getPath() + "//" +  new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".jpg";
+            String filepath = storeFileDir.getPath() + "//" +  new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".jpg";
             File file = new File(filepath);
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-            // 图片存储时，需对其进行旋转
-            // 后置摄像头对照片进行顺时针旋转90度，前置摄像头则逆时针转90度
-            Matrix matRotate = new Matrix();
-            if(cameraPosition == 0){
-                matRotate.setRotate(-picRotationDegree);
-            }else{
-                matRotate.setRotate(picRotationDegree);
+            if(ifCrop){
+                saved_photo = cropImageView.getCropImage();
             }
-            Log.d(TAG, "image width "+saved_photo.getWidth()+"image height "+saved_photo.getHeight());
-            // 先对图片进行剪切
-            int h = 0, w = (int)( 2*getResources().getDimension(R.dimen.photo_preview_bar_height));
-            saved_photo = Bitmap.createBitmap(saved_photo, w, h, storeImageWidth, storeImageHeight,null, true);
-            // 再进行旋转
-            saved_photo = Bitmap.createBitmap(saved_photo, 0, 0, saved_photo.getWidth(), saved_photo.getHeight(), matRotate, true);
             saved_photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             bos.flush();    // 刷新此缓冲区的输出流
             bos.close();    // 关闭此输出流并释放与此流有关的所有系统资源
-            // 跳转到裁剪Activity:viCropImageActivity
-//            Intent int2 = new Intent(viCameraActivity.this, viCropImageActivity.class);
-//            int2.putExtra("bitmap",saved_photo);
-//            int2.putExtra("width",saved_photo.getWidth());
-//            int2.putExtra("height",saved_photo.getHeight());
             // 跳转到其他的Activity
             if(originActivity!=null){
                 Intent newint = new Intent(viCameraActivity.this, originActivity);
@@ -444,6 +635,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         // 显示take_photo_bar_layout
         take_photo_bar_rl.setVisibility(View.VISIBLE);
         preview_photo_rl.setVisibility(View.INVISIBLE);
+        crop_photo_rl.setVisibility(View.INVISIBLE);
         focus_View.setVisibility(View.VISIBLE);
 
         camera.setDisplayOrientation(90);
@@ -463,15 +655,16 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                     // 必须是后置摄像头且正在预览状态
                     if (cameraPosition==1&&isPreviewing && !isFocused)
                         camera.autoFocus(autoFocusCallback);
-                    Message msg = Message.obtain();
-                    if (isFocused)
+                        Message msg = Message.obtain();
+                    if (isFocused) {
                         msg.what = MSG_FOCUSED;
-                    else
+                    } else {
                         msg.what = MSG_FOCUS_FAILED;
+                    }
                     handler.sendMessage(msg);
                 }
                 try{
-                    Thread.currentThread().sleep(20);
+                    Thread.currentThread().sleep(10);
                 }catch (InterruptedException e){
                     e.printStackTrace();
                 }
@@ -483,39 +676,51 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode!=RESULT_OK){
-            Toast.makeText(getApplicationContext(),"发生错误返回!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"没有选择任何图片!",Toast.LENGTH_SHORT).show();
             return;
         }
-        if(requestCode==REQUEST_CODE_PICK_IMAGE){
+        if(requestCode==REQUEST_CODE_PICK_IMAGE) {
             Uri uri = data.getData();
             String[] proj = {MediaStore.Images.Media.DATA};
-            Cursor cursor = managedQuery(uri,proj,null,null,null);
+            Cursor cursor = managedQuery(uri, proj, null, null, null);
             // 获得图片索引值
             int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             // 将光标移至开头
             cursor.moveToFirst();
             // 最后根据索引值获取图片路径
             String filepath = cursor.getString(index);
-            // 跳转到其他的Activity
-            if(originActivity!=null){
-                Intent newint = new Intent(viCameraActivity.this, originActivity);
-                newint.putExtra("imagepath", filepath);
-                setResult(RESULT_OK,newint);
-            }else if(destActivity!=null){
-                Intent newint = new Intent(viCameraActivity.this, destActivity);
-                newint.putExtra("imagepath", filepath);
-                startActivity(newint);
+            if (ifCrop) {
+                saved_photo = BitmapFactory.decodeFile(filepath);
+                cropPhoto();
+            }else {
+                // 跳转到其他的Activity
+                if (originActivity != null) {
+                    Intent newint = new Intent(viCameraActivity.this, originActivity);
+                    newint.putExtra("imagepath", filepath);
+                    setResult(RESULT_OK, newint);
+                } else if (destActivity != null) {
+                    Intent newint = new Intent(viCameraActivity.this, destActivity);
+                    newint.putExtra("imagepath", filepath);
+                    startActivity(newint);
+                }
+                this.finish();
             }
-            this.finish();
         }
     }
 
     @Override
     protected void onPause() {
+        // 取消注册监听器
         if(shakeDetector!=null)
             shakeDetector.unregisterOnShakeListener(onShakeListener);
         if(scrnOrientDetector!=null)
             scrnOrientDetector.unregisterOnShakeListener(onSrcnListener);
+        // 停止自动对焦线程
+        if(myAFthread!=null) {
+            ifStopAFthread = true;
+            myAFthread.interrupt();
+            myAFthread = null;
+        }
         super.onPause();
     }
 
@@ -525,6 +730,13 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
             shakeDetector.registerOnShakeListener(onShakeListener);
         if(scrnOrientDetector!=null)
             scrnOrientDetector.registerOnShakeListener(onSrcnListener);
+        // 重新启动自动对焦线程
+        if(myAFthread == null) {
+            isFocused = false;
+            ifStopAFthread = false;
+            myAFthread = new Thread(new myAutoFocusThread());
+            myAFthread.start();
+        }
         super.onResume();
     }
 

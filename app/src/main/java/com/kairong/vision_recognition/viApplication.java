@@ -33,6 +33,15 @@ public class viApplication extends Application{
     private int IMAGE_LOAD_IN_MEM_MAX_WIDTH;
     /*加载到内存图片的最大大小*/
     private int IMAGE_LOAD_IN_MEM_MAX_SIZE;
+
+    private float crop_photo_wh_ratio;
+    /*裁剪图片的常见宽高比*/
+    private float CROP_PHOTO_16W9H_RATIO = 1.7778f;
+    private float CROP_PHOTO_9W16H_RATIO = 0.5625f;
+    private float CROP_PHOTO_3W2H_RATIO = 1.5000f;
+    private float CROP_PHOTO_2W3H_RATIO = 0.6667f;
+    private float CROP_PHOTO_4W3H_RATIO = 1.3333f;
+    private float CROP_PHOTO_3W4H_RATIO = 0.7500f;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -43,7 +52,6 @@ public class viApplication extends Application{
         tertiary_margin = (int)(r.getDimension(R.dimen.activity_tertiary_margin));
         main_2_btn_size = (int)(r.getDimension(com.kairong.vision_recognition.R.dimen.main_2_btn_size));
         main_1_btn_size = (int)(r.getDimension(com.kairong.vision_recognition.R.dimen.main_1_btn_size));
-
     }
 
     public String getAppName(){
@@ -112,6 +120,16 @@ public class viApplication extends Application{
     public int getIMAGE_LOAD_IN_MEM_MAX_SIZE(){
         return this.IMAGE_LOAD_IN_MEM_MAX_SIZE;
     }
+    public float getCROP_PHOTO_WH_RATIO(String tag){
+        if(tag.contains("16:9")) {crop_photo_wh_ratio = CROP_PHOTO_16W9H_RATIO;}
+        else if(tag.contains("9:16")) {crop_photo_wh_ratio = CROP_PHOTO_9W16H_RATIO;}
+        else if(tag.contains("3:2"))  {crop_photo_wh_ratio = CROP_PHOTO_3W2H_RATIO;}
+        else if(tag.contains("2:3"))  {crop_photo_wh_ratio = CROP_PHOTO_2W3H_RATIO;}
+        else if(tag.contains("4:3"))  {crop_photo_wh_ratio = CROP_PHOTO_4W3H_RATIO;}
+        else if(tag.contains("3:4"))  {crop_photo_wh_ratio = CROP_PHOTO_3W4H_RATIO;}
+        return this.crop_photo_wh_ratio;
+    }
 
-    
+    public static viApplication viApp = null;
+
 }

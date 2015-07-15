@@ -48,7 +48,7 @@ public class TextCovtActivity extends Activity {
         @Override
         public boolean onLongClick(View v) {
             Intent imgIntent = new Intent(TextCovtActivity.this, viCameraActivity.class);
-            imgIntent.putExtra("SrcTag", TAG);
+            imgIntent.putExtra("OriginTag", TAG);
             startActivityForResult(imgIntent, CAMERA_IMAGE_CODE);
             return false;
         }

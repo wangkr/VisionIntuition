@@ -60,7 +60,7 @@ public class AutoRecgActivity extends Activity{
         @Override
         public boolean onLongClick(View v) {
             Intent imgIntent = new Intent(AutoRecgActivity.this, viCameraActivity.class);
-            imgIntent.putExtra("SrcTag", TAG);
+            imgIntent.putExtra("OriginTag", TAG);
             startActivityForResult(imgIntent, CAMERA_IMAGE_CODE);
             return false;
         }
