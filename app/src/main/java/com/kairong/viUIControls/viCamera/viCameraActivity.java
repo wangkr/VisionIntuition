@@ -10,6 +10,7 @@ import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,6 +19,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -70,12 +72,18 @@ import java.util.Map;
  * mail:wangkrhust@gmail.com
  */
 public class viCameraActivity extends Activity implements SurfaceHolder.Callback {
-    private viApplication app;
+    // 布局按钮
+    private ImageView btn_gallery = null;
+    private ImageView btn_camera_change = null;
+    private ImageView btn_shutter = null;
+    private Button btn_take_photo_ok = null;
+    private Button btn_take_photo_cancell = null;
+    private Button btn_crop_cancell = null;
+    private Button btn_crop_done = null;
     private SurfaceView surface = null;
     private Camera camera = null;                       // 声明相机
     private int cameraPosition = 1;                     // 0代表前置摄像头，1代表后置摄像头
     private int srcnOrient = 0;
-    private int picRotationDegree = 0;
     private CropImageView cropImageView = null;         // 裁剪图片View
     private SurfaceHolder holder = null;
     private ImageView focus_View = null;                // 显示对焦光标
@@ -85,9 +93,11 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     private RelativeLayout take_photo_bar_rl = null;
     private RelativeLayout preview_photo_rl  = null;
     private RelativeLayout crop_photo_rl = null;
+    private RelativeLayout  crop_wh_ratio_btn_rl= null;
     private ListView crop_wh_ratio_drop_down_listView = null;
     private Bitmap saved_photo = null;
     private Parameters previewParameters = null;
+    // viCameraActivity结束时的跳转Activity
     private Class originActivity = null;
     private Class destActivity = null;
     private Thread myAFthread = null;                   // 自动对焦监测线程
@@ -126,7 +136,6 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        app = (viApplication)getApplication();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.take_photo_activity);
         // 获取跳转Activity class 引用
@@ -144,14 +153,30 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         storeImageWidth = ((viApplication)getApplication()).getScreenHeight() - (int)( 2*getResources().getDimension(R.dimen.photo_preview_bar_height));
         storeImageHeight = ((viApplication)getApplication()).getScreenWidth();
 
-        // 设置控件资源ID
-        ImageView btn_gallery = (ImageView)findViewById(R.id.btn_take_photo_gallery);
-        ImageView btn_camera_change = (ImageView)findViewById(R.id.btn_camera_change);
-        ImageView btn_shutter = (ImageView)findViewById(R.id.btn_take_photo);
-        Button btn_take_photo_ok = (Button)findViewById(R.id.btn_take_photo_ok);
-        Button btn_take_photo_cancell = (Button)findViewById(R.id.btn_take_photo_cancell);
-        Button btn_crop_cancell = (Button)findViewById(R.id.btn_crop_cancell);
-        Button btn_crop_done = (Button)findViewById(R.id.btn_crop_done);
+        // 初始化控件资源ID
+        initView();
+        // 初始化控件监听
+        initListener();
+
+        // 照片固定的比例进行裁剪,默认16:9
+        crop_wh_ratio = viApplication.viApp.getCROP_PHOTO_WH_RATIO("16:9");
+
+        storeFileDir = new File(Environment.getExternalStorageDirectory(), "VisionIntuition");
+        if (!storeFileDir.exists()) {
+            storeFileDir.mkdir();
+        }
+
+    }
+
+    // 初始化控件资源ID
+    private void initView(){
+        btn_gallery = (ImageView)findViewById(R.id.btn_take_photo_gallery);
+        btn_camera_change = (ImageView)findViewById(R.id.btn_camera_change);
+        btn_shutter = (ImageView)findViewById(R.id.btn_take_photo);
+        btn_take_photo_ok = (Button)findViewById(R.id.btn_take_photo_ok);
+        btn_take_photo_cancell = (Button)findViewById(R.id.btn_take_photo_cancell);
+        btn_crop_cancell = (Button)findViewById(R.id.btn_crop_cancell);
+        btn_crop_done = (Button)findViewById(R.id.btn_crop_done);
         crop_wh_ratio_text = (TextView)findViewById(R.id.crop_wh_ratio_text);
         surface = (SurfaceView)findViewById(R.id.surfaceview);
         focus_View = (ImageView)findViewById(R.id.focus);
@@ -161,9 +186,16 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         take_photo_bar_rl = (RelativeLayout)findViewById(R.id.take_photo_bar_layout);
         preview_photo_rl = (RelativeLayout)findViewById(R.id.preview_photo_layout);
         crop_photo_rl = (RelativeLayout)findViewById(R.id.crop_photo_layout);
-        RelativeLayout crop_wh_ratio_btn_rl = (RelativeLayout)findViewById(R.id.crop_wh_ratio_btn_layout);
+        crop_wh_ratio_btn_rl = (RelativeLayout)findViewById(R.id.crop_wh_ratio_btn_layout);
         cropImageView = (CropImageView)findViewById(R.id.crop_image_view);
         crop_wh_ratio_drop_down_listView = (ListView)findViewById(R.id.crop_wh_ratio_drop_down_list);
+
+        SimpleAdapter adapter = new SimpleAdapter(this,getData(),R.layout.crop_wh_ratio_vlist,new String[] {"vlist_image","vlist_text"},new int[] {R.id.vlist_image,R.id.vlist_text});
+        crop_wh_ratio_drop_down_listView.setAdapter(adapter);
+        crop_wh_ratio_drop_down_listView.setOnItemClickListener(onItemClickListener);
+    }
+    // 控件监听初始化
+    private void initListener(){
         // 设置控件监听
         btn_shutter.setOnClickListener(gl_listener);
         btn_camera_change.setOnClickListener(gl_listener);
@@ -174,18 +206,23 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         btn_crop_done.setOnClickListener(gl_listener);
         crop_wh_ratio_btn_rl.setOnClickListener(gl_listener);
 
-        SimpleAdapter adapter = new SimpleAdapter(this,getData(),R.layout.crop_wh_ratio_vlist,new String[] {"vlist_image","vlist_text"},new int[] {R.id.vlist_image,R.id.vlist_text});
-        crop_wh_ratio_drop_down_listView.setAdapter(adapter);
-        crop_wh_ratio_drop_down_listView.setOnItemClickListener(onItemClickListener);
-        // 照片固定的比例进行裁剪,默认16:9
-        crop_wh_ratio = viApplication.viApp.getCROP_PHOTO_WH_RATIO("16:9");
-
-        storeFileDir = new File(Environment.getExternalStorageDirectory(), "VisionIntuition");
-        if (!storeFileDir.exists()) {
-            storeFileDir.mkdir();
-        }
+        surface.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Rect surfaceRect = new Rect();
+                view.getDrawingRect(surfaceRect);
+                int photo_bar_height = (int) (getResources().getDimension(R.dimen.photo_preview_bar_height));
+                surfaceRect.top += photo_bar_height;
+                surfaceRect.bottom -= photo_bar_height;
+                float m_X = motionEvent.getX(0);
+                float m_Y = motionEvent.getY(0);
+                if (isPreviewing && cameraPosition == 1 && surfaceRect.contains((int) m_X, (int) m_Y)) {
+                    isFocused = false;
+                }
+                return false;
+            }
+        });
     }
-
     /**
      * 为了防止系统gc时发生内存泄露
      * 自定义的一个Handler静态类
@@ -244,7 +281,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             float cur_crop_wh_ratio = viApplication.viApp.getCROP_PHOTO_WH_RATIO(vlist_text[position]);
-            crop_wh_ratio_set();
+            crop_wh_vlist_show_hide();
             crop_wh_ratio_text.setText(vlist_text[position]);
             if(cur_crop_wh_ratio!=crop_wh_ratio){
                 cropImageView.refreshDrawable(cur_crop_wh_ratio);
@@ -290,7 +327,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                     storePhoto();
                     break;
                 case R.id.crop_wh_ratio_btn_layout:
-                    crop_wh_ratio_set();
+                    crop_wh_vlist_show_hide();
                     break;
             }
         }
@@ -467,9 +504,9 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     }
 
     /**
-     * 裁剪处理
+     * 设置默认裁剪宽高
      */
-    private void cropPhoto(){
+    private void setDefaultCropWH(){
         // 显示preview_photo_layout
         {
             take_photo_bar_rl.setVisibility(View.INVISIBLE);
@@ -478,18 +515,31 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         int cropWidth,cropHeight;
         Log.d(TAG,""+crop_wh_ratio);
         int srcWidth = saved_photo.getWidth(),srcHeight = saved_photo.getHeight();
-        float srcWHratio = (float)srcWidth/srcHeight;
-        if(srcWHratio>=1){
+        float src_wh_ratio = (float)srcWidth/srcHeight;
+        // 根据源图像的宽高比预设裁剪宽高比
+        if(src_wh_ratio>=1){
             crop_wh_ratio = crop_wh_ratio > 1?crop_wh_ratio:1/crop_wh_ratio;
         } else {
             crop_wh_ratio = crop_wh_ratio < 1?crop_wh_ratio:1/crop_wh_ratio;
         }
-        if(crop_wh_ratio>=srcWHratio){
+        // 调整裁剪宽高
+        if(crop_wh_ratio>=src_wh_ratio){
             cropWidth = srcWidth;
             cropHeight = (int)(cropWidth / crop_wh_ratio);
         } else {
             cropHeight = srcHeight;
             cropWidth = (int)(cropHeight * crop_wh_ratio);
+        }
+        // 不能超过屏幕
+        if(cropWidth>viApplication.viApp.getScreenWidth()||cropHeight>viApplication.viApp.getScreenHeight()){
+            if(crop_wh_ratio>=1){
+                cropWidth = viApplication.viApp.getScreenWidth();
+                cropHeight = (int) (cropWidth/crop_wh_ratio);
+            }
+            else {
+                cropHeight = viApplication.viApp.getScreenHeight();
+                cropWidth = (int) (cropHeight*crop_wh_ratio);
+            }
         }
         // 设置固定宽高比值
         cropImageView.setIfFixedWHratio(true);
@@ -497,8 +547,10 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         crop_photo_rl.setVisibility(View.VISIBLE);
     }
 
-    // 设置裁剪宽高比
-    private void crop_wh_ratio_set(){
+    /**
+     * 显示/隐藏裁剪宽高比菜单
+     */
+    private void crop_wh_vlist_show_hide(){
         if(!cropvlist_visible){
             Animation animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF,0f,
                     Animation.RELATIVE_TO_SELF,0f,
@@ -563,7 +615,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
             try{
-                picRotationDegree = srcnOrient;
+                int picRotationDegree = srcnOrient;
                 saved_photo = BitmapFactory.decodeByteArray(data,0,data.length);
                 camera.stopPreview();
                 isPreviewing = false;
@@ -584,7 +636,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                 }
                 // 是否裁剪图片
                 if(ifCrop) {
-                    cropPhoto();
+                    setDefaultCropWH();
                 }else {
                     preview_photo_rl.setVisibility(View.VISIBLE);
                     imageView_photo_preview.setImageBitmap(saved_photo);
@@ -594,6 +646,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
             }
         }
     };
+
 
     /**
      * 存储照片
@@ -691,7 +744,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
             String filepath = cursor.getString(index);
             if (ifCrop) {
                 saved_photo = BitmapFactory.decodeFile(filepath);
-                cropPhoto();
+                setDefaultCropWH();
             }else {
                 // 跳转到其他的Activity
                 if (originActivity != null) {
@@ -744,6 +797,11 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     //无意中按返回键时要释放内存
     @Override
     public void onBackPressed() {
+        if(saved_photo!=null) {
+            saved_photo.recycle();
+            saved_photo = null;
+        }
         this.finish();
+        System.gc();
     }
 }
