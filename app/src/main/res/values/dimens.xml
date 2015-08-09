@@ -20,19 +20,23 @@
     <dimen name="title_text_bk_size">62sp</dimen>
     <dimen name="octopus_layout_marTop">50dp</dimen>
     <!-- viCameraActivity(take_photo_activity)-->
-    <dimen name="photo_preview_ok_btn_Width">64dp</dimen>
-    <dimen name="photo_preview_ok_btn_Heigth">40dp</dimen>
-    <dimen name="crop_ratio_btn_width">46dp</dimen>
-    <dimen name="crop_ratio_btn_height">28dp</dimen>
+    <dimen name="take_photo_2_btn_size">36dp</dimen>
+    <dimen name="take_photo_mode_btn_width">75dp</dimen>
+    <dimen name="take_photo_mode_btn_height">28dp</dimen>
+    <dimen name="take_photo_mode_list_width">100dp</dimen>
+    <dimen name="layout_bar_btn_width">60dp</dimen>
+    <dimen name="layout_bar_btn_height">32dp</dimen>
+    <dimen name="photo_preview_ok_btnTextSize">15sp</dimen>
+    <dimen name="layout_bar_height">64dp</dimen>
     <dimen name="layout_bar_vPadding">20dp</dimen>
     <dimen name="layout_bar_hPadding">20dp</dimen>
-    <dimen name="photo_preview_ok_btnTextSize">18sp</dimen>
-    <dimen name="photo_preview_bar_height">64dp</dimen>
     <dimen name="shutter_btn_size">56dp</dimen>
     <dimen name="focus_image_size">128dp</dimen>
-    <dimen name="take_photo_2_btn_width">48dp</dimen>
-    <dimen name="take_photo_2_btn_height">36dp</dimen>
+    <!-- CropImageActivity(crop_image_activity)-->
+    <dimen name="crop_ratio_btn_width">46dp</dimen>
+    <dimen name="crop_ratio_btn_height">26dp</dimen>
     <dimen name="crop_drop_down_list_width">80dp</dimen>
+    <dimen name="cropImage_title_size">22sp</dimen>
     <dimen name="icn_triangle_size">8dp</dimen>
     <dimen name="icn_triangle_margin">5dp</dimen>
     <!-- crop_wh_ratio_vlist-->
@@ -40,8 +44,6 @@
     <dimen name="crop_vlist_text_size">14sp</dimen>
     <dimen name="crop_vlist_item_margin">5dp</dimen>
     <dimen name="crop_vlist_text_start_margin">8dp</dimen>
-    <!-- CropImageActivity(crop_image_activity)-->
-    <dimen name="cropImage_title_size">24sp</dimen>
     <!-- Horizontal list view-->
     <dimen name="image_item_hpadding">3dp</dimen>
     <dimen name="image_item_vpadding">10dp</dimen>
@@ -81,4 +83,9 @@
     <dimen name="vi_hint_text_size">10sp</dimen>
     <dimen name="vi_hint_btn_lrPadding">2dp</dimen>
     <dimen name="vi_hint_btn_tPadding">6dp</dimen>
+    <!-- auto_recog_activity-->
+    <dimen name="auto_top_bar_btn_width">56dp</dimen>
+    <dimen name="auto_top_bar_btn_height">32dp</dimen>
+    <dimen name="auto_tabhost_height">260dp</dimen>
+    <dimen name="tabwidget_height">40dp</dimen>
 </resources>

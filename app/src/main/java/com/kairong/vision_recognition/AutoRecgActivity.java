@@ -50,7 +50,7 @@ public class AutoRecgActivity extends Activity{
 
         filepath = getIntent().getStringExtra("imagepath");
         mImageView = (ImageView)findViewById(R.id.auto_image_view);
-       findViewById(R.id.auto_image_layout).setOnLongClickListener(onLongClickListener_ImageView);
+//       findViewById(R.id.auto_image_layout).setOnLongClickListener(onLongClickListener_ImageView);
 
 
         bitmap = BitmapUtil.decodeSampledBitmapFromFile(filepath, ImageView_Width, ImageView_Height);

@@ -20,4 +20,6 @@
     <string name="last_step">上一步</string>
     <string name="next_step">下一步</string>
     <string name="done_text">完成</string>
+    <string name="re_take_photo">重拍</string>
+    <string name="save_photo">保存</string>
 </resources>

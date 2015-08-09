@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/crop_image_layout_bk">
+    <!-- 裁剪图片布局-->
+    <com.kairong.viUIControls.viCropImage.CropImageView
+        android:id="@+id/crop_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="@dimen/layout_bar_height"
+        android:layout_marginTop="@dimen/layout_bar_height"
+        />
+    <!-- 下拉菜单-->
+    <ListView
+        android:id="@+id/crop_wh_ratio_drop_down_list"
+        android:layout_width="@dimen/crop_drop_down_list_width"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/layout_bar_height"
+        android:background="@drawable/background_with_frame_line"
+        android:divider="@color/vi_blue_color"
+        android:dividerHeight="1px"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:padding="1px"
+        android:visibility="invisible">
+    </ListView>
+    <!-- 标题栏设置-->
+    <RelativeLayout
+        android:id="@+id/crop_layout_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/layout_bar_height"
+        android:background="@color/layout_bar_color"
+        android:paddingLeft="@dimen/layout_bar_hPadding"
+        android:paddingRight="@dimen/layout_bar_hPadding"
+        android:layout_alignParentTop="true">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/cropImage_title"
+            android:textColor="@android:color/holo_blue_light"
+            android:textSize="@dimen/cropImage_title_size"
+            />
+        <LinearLayout
+            android:id="@+id/crop_wh_ratio_btn_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/crop_ratio_btn_height"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:background="@drawable/btn_bg">
+            <TextView
+                android:id="@+id/crop_wh_ratio_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"/>
+            <ImageView
+                android:layout_width="@dimen/icn_triangle_size"
+                android:layout_height="@dimen/icn_triangle_size"
+                android:layout_marginRight="@dimen/icn_triangle_margin"
+                android:layout_marginEnd="@dimen/icn_triangle_margin"
+                android:background="@drawable/icn_triangle"/>
+        </LinearLayout>
+    </RelativeLayout><!-- end 标题栏设置-->
+    <!-- 按钮设置-->
+    <RelativeLayout
+        android:id="@+id/crop_layout_btn_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/layout_bar_height"
+        android:background="@color/layout_bar_color"
+        android:layout_alignParentBottom="true"
+        android:paddingLeft="@dimen/layout_bar_vPadding"
+        android:paddingRight="@dimen/layout_bar_vPadding">
+        <Button
+            android:id="@+id/btn_crop_back"
+            android:layout_width="@dimen/layout_bar_btn_width"
+            android:layout_height="@dimen/layout_bar_btn_height"
+            android:text="@string/last_step"
+            android:textColor="@android:color/holo_blue_light"
+            android:textSize="@dimen/photo_preview_ok_btnTextSize"
+            android:background="@drawable/btn_bg"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            />
+        <Button
+            android:id="@+id/btn_crop_done"
+            android:layout_width="@dimen/layout_bar_btn_width"
+            android:layout_height="@dimen/layout_bar_btn_height"
+            android:text="@string/done_text"
+            android:textColor="@android:color/holo_blue_light"
+            android:textSize="@dimen/photo_preview_ok_btnTextSize"
+            android:background="@drawable/btn_bg"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            />
+    </RelativeLayout><!-- end按钮设置-->
+</RelativeLayout>

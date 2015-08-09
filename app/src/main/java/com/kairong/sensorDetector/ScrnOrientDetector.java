@@ -62,8 +62,8 @@ public class ScrnOrientDetector implements SensorEventListener {
                 .getSystemService(Context.SENSOR_SERVICE);
         mListeners = new ArrayList<OnSrcnListener>();
         SrcnOrientation = 0;
-        orientChangedThreshold = 2;
-        UPDATE_INTERVAL = 100;
+        orientChangedThreshold = 1;
+        UPDATE_INTERVAL = 10;
     }
 
     /**
@@ -147,7 +147,7 @@ public class ScrnOrientDetector implements SensorEventListener {
         if (magnitude * 4 >= z * z) {
             float OneEightyOverPi = 57.29577957855f;
             float angle = (float) Math.atan2(-y, x) * OneEightyOverPi;
-            SrcnOrientation = 90 - (int) Math.round(angle);
+            SrcnOrientation = 90 -  Math.round(angle);
             // 归为0 - 359范围内
             while (SrcnOrientation >= 360) {
                 SrcnOrientation -= 360;

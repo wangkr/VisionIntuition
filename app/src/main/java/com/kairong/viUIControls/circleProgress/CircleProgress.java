@@ -2,6 +2,7 @@ package com.kairong.viUIControls.circleProgress;
 
 /**
  * Created by Kairong on 2015/5/19.
+ * mail:wangkrhust@gmail.com
  */
 import android.animation.TimeInterpolator;
 import android.content.Context;

@@ -10,6 +10,7 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
+import android.media.ExifInterface;
 import android.util.Size;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.io.InputStream;
  */
 public final class BitmapUtil {
 
-    public static int IMAGE_MAX_LOAD_SIZE = 3145728;
+    public static int IMAGE_MAX_LOAD_SIZE = 13107200;
     /**
      * 取得指定区域的图形
      *
@@ -309,7 +310,6 @@ public final class BitmapUtil {
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
-
         if (height > reqHeight || width > reqWidth) {
 
             final int halfHeight = height / 2;
@@ -389,6 +389,14 @@ public final class BitmapUtil {
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
+        Bitmap sampleBit = BitmapFactory.decodeFile(filepath,options);
+        // 出现sample Bitmap高大于request高的情况
+        if(sampleBit.getHeight()>size.getHeight()){
+            float scale = (float)size.getHeight()/sampleBit.getHeight();
+            Matrix m = new Matrix();
+            m.setScale(scale,scale);
+            return Bitmap.createBitmap(sampleBit,0,0,sampleBit.getWidth(),sampleBit.getHeight(),m,true);
+        }
         return BitmapFactory.decodeFile(filepath, options);
     }
 
@@ -405,8 +413,8 @@ public final class BitmapUtil {
         BitmapFactory.decodeFile(filepath,options);
         int imageHeight = options.outHeight;
         int imageWidth = options.outWidth;
-        // 图像大小不能超过一定的阈值
 
+        // 图像大小不能超过一定的阈值
         int imageSize = imageHeight*imageWidth;
         if(imageSize>image_load_in_mem_max_size){
             scale = Math.sqrt(image_load_in_mem_max_size*1.0/imageSize);
@@ -418,6 +426,33 @@ public final class BitmapUtil {
         return new viSize(reqWidth,reqHeight);
     }
 
+    public static viSize getImageReq(String filepath, int maxWidth, int maxHeight){
+        int reqWidth,reqHeight;
+        double scale;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filepath,options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+
+        // 图像大小不能超过给定的最大宽高
+        float imageRatio = (float)imageWidth/imageHeight,maxRatio = (float) maxWidth/maxHeight;
+        if(imageRatio >= maxRatio){
+            scale = (float)maxWidth/imageWidth;
+            if(imageHeight*scale>maxHeight){
+                scale = (float)maxHeight/imageHeight;
+            }
+        } else {
+            scale = (float)maxHeight/imageHeight;
+            if(imageWidth*scale>maxWidth){
+                scale = (float)maxWidth/imageWidth;
+            }
+        }
+
+        reqWidth = (int)(imageWidth*scale);
+        reqHeight = (int)(imageHeight*scale);
+        return new viSize(reqWidth,reqHeight);
+    }
     /**
      * 在加载图片到内存前获取其大小
      * @param filepath：图片路径
@@ -430,5 +465,32 @@ public final class BitmapUtil {
         int imageHeight = options.outHeight;
         int imageWidth = options.outWidth;
         return imageHeight*imageWidth;
+    }
+
+    /**
+     * 读取图片属性：旋转的角度
+     * @param path 图片绝对路径
+     * @return degree旋转的角度
+     */
+    public static int readPictureDegree(String path) {
+        int degree  = 0;
+        try {
+            ExifInterface exifInterface = new ExifInterface(path);
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    degree = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    degree = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    degree = 270;
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return degree;
     }
 }

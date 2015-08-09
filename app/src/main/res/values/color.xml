@@ -3,7 +3,7 @@
     <color name="vi_red_color">#ffff4444</color>
     <color name="vi_green_color">#ff99cc00</color>
     <color name="vi_blue_color">#ff0099cc</color>
-    <color name="activity_background_color">#6ABD78</color>
+    <color name="activity_background_color">#003366</color>
     <color name="text_title_color">#3BAF36</color>
     <color name="camer_open_button_color">#ffff4444</color>
     <color name="gallery_open_button_color">#ff99cc00</color>
@@ -18,7 +18,7 @@
     <color name="semitransparent_color">#50FFFFFF</color>
     <color name="cutLine_color">#88FFFFFF</color>
     <color name="face_similarity_background_color">#83ca759f</color>
-    <color name="take_photo_toolbar_color">#001320</color>
+    <color name="layout_bar_color">#001133</color>
     <color name="vi_alertDialog_bk_color">#995dd0ff</color>
     <color name="vi_alertDialog_bar_color">#42a5ce</color>
     <color name="vi_alertDialog_cmBtn_color">#ffff4444</color>

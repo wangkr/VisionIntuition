@@ -18,8 +18,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kairong.viUIControls.circleButton.CircleButton;
+import com.kairong.viUIControls.viCamera.BitmapIntent;
+import com.kairong.viUIControls.viCamera.CamTargetList;
+import com.kairong.viUIControls.viCamera.CameraRequest;
+import com.kairong.viUIControls.viCamera.CropPhotoType;
+import com.kairong.viUIControls.viCamera.TakePhotoMode;
 import com.kairong.viUIControls.viCamera.viCameraActivity;
 import com.kairong.viUIControls.myPathButton.myAnimations;
+import com.kairong.viUIControls.viCropImage.CropImageActivity;
 import com.kairong.viUtils.BitmapUtil;
 
 /**
@@ -35,7 +41,9 @@ public class MainActivity extends Activity {
     private long exitTime = 0;
     private static final int REQUEST_CODE_PICK_IMAGE = 3022;
     private myAnimations myanimation = null;
-
+    private String[] ratio_opt = new String[]{"16:9","4:3","3:2"};
+    private CameraRequest cameraRequest = new CameraRequest(CropPhotoType.CROP_FIXED_RATIO, TakePhotoMode.LANDSCAPE_MODE,"16:9", null,
+            CamTargetList.getTargetClass("AutoRecgActivity"),ratio_opt);
     private String TAG = "MainActivity";
 
     @Override
@@ -66,9 +74,10 @@ public class MainActivity extends Activity {
         btn_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("cameraRequest",cameraRequest);
                 Intent intent = new Intent(MainActivity.this,viCameraActivity.class);
-                intent.putExtra("DestTag", "AutoRecgActivity");
-                intent.putExtra("ifCrop",true);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
@@ -134,10 +143,10 @@ public class MainActivity extends Activity {
                 Uri uri = data.getData();
                 String[] proj = {MediaStore.Images.Media.DATA};
                 Cursor cursor = managedQuery(uri, proj, null, null, null);
-                // 获得图片索引值
-                int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
                 // 将光标移至开头
                 cursor.moveToFirst();
+                // 获得图片索引值
+                int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
                 // 最后根据索引值获取图片路径
                 String filepath = cursor.getString(index);
                 // 判断图像大小是否超过最大值，超过则不加载
@@ -145,9 +154,20 @@ public class MainActivity extends Activity {
                     Toast.makeText(this, "图片尺寸过大!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Intent newint = new Intent(MainActivity.this,AutoRecgActivity.class);
-                newint.putExtra("imagepath",filepath);
-                startActivity(newint);
+                int orientation = BitmapUtil.readPictureDegree(filepath);
+                BitmapIntent bitmapIntent = new BitmapIntent(orientation,filepath,BitmapIntent.FROM_GALLERY);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("bitmapIntent", bitmapIntent);
+                if(cameraRequest.ifCrop()) {
+                    bundle.putSerializable("cameraRequest", cameraRequest);
+                    Intent intent = new Intent(MainActivity.this, CropImageActivity.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                } else if(cameraRequest.goDestClass()){
+                    Intent intent1 = new Intent(MainActivity.this,cameraRequest.getDestClass());
+                    intent1.putExtras(bundle);
+                    startActivity(intent1);
+                }
                 break;
         }
     }

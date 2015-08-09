@@ -3,6 +3,7 @@ package com.kairong.viUIControls.viCropImage;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -13,6 +14,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.kairong.viUtils.BitmapUtil;
 import com.kairong.vision_recognition.R;
 import com.kairong.vision_recognition.viApplication;
 
@@ -282,7 +284,7 @@ public class CropImageView extends View {
         // 在画布上画浮层FloatDrawable,Region.Op.DIFFERENCE是表示Rect交集的补集
         canvas.clipRect(mDrawableFloat, Region.Op.DIFFERENCE);
         // 在交集的补集上画上灰色用来区分
-        canvas.drawColor(Color.parseColor("#a00099cc"));
+        canvas.drawColor(Color.parseColor("#880099cc"));
         canvas.restore();
         // 画浮层
         mFloatDrawable.draw(canvas);
@@ -409,23 +411,22 @@ public class CropImageView extends View {
         invalidate();
     }
     // 进行图片的裁剪，所谓的裁剪就是根据Drawable的新的坐标在画布上创建一张新的图片
-    public Bitmap getCropImage() {
-        Bitmap tmpBitmap = Bitmap.createBitmap(getWidth(), getHeight(),
-                Bitmap.Config.RGB_565);
-        Canvas canvas = new Canvas(tmpBitmap);
-        mDrawable.draw(canvas);
+    public Bitmap getCropImage(String originFilePath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(originFilePath,options);
+        float scale = (float)options.outWidth/srcDrawableWidth;
 
-        Matrix matrix = new Matrix();
-        float scale = (float) (mDrawableSrc.width())
-                / (float) (mDrawableDst.width());
-        matrix.postScale(scale, scale);
+        Bitmap tmpBitmap = BitmapFactory.decodeFile(originFilePath);
+        int savedWidth = (int)Math.floor(mDrawableFloat.width()*scale);
+        int savedHeight = (int)Math.floor(mDrawableFloat.height()*scale);
+        int newleft = (int)Math.floor((mDrawableFloat.left-mDrawableSrc.left) * scale);
+        int newtop = (int)Math.floor((mDrawableFloat.top-mDrawableSrc.top) * scale);
 
-        Bitmap ret = Bitmap.createBitmap(tmpBitmap, mDrawableFloat.left,
-                mDrawableFloat.top, mDrawableFloat.width(),
-                mDrawableFloat.height(), matrix, true);
+        Bitmap ret = Bitmap.createBitmap(tmpBitmap, newleft,
+                newtop, savedWidth,
+                savedHeight, null, true);
         tmpBitmap.recycle();
-        tmpBitmap = null;
-
         return ret;
     }
 

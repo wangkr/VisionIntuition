@@ -1,10 +1,14 @@
 package com.kairong.vision_recognition;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.res.Resources;
+import android.os.Environment;
 import android.util.DisplayMetrics;
 
 import com.kairong.viUtils.DisplayUtil;
+
+import java.io.File;
 
 /**
  * Created by wangkr on 15-7-10 at USTC
@@ -34,6 +38,13 @@ public class viApplication extends Application{
     /*加载到内存图片的最大大小*/
     private int IMAGE_LOAD_IN_MEM_MAX_SIZE;
 
+    /*应用存放根目录 /mnt/extSdCard/VisionIntuition/ */
+    private String rootFileDir;
+    /*应用临时文件存放目录 $rootFileDir/temp/ */
+    private String tempFileDir;
+    /*应用存放保存照片的目录 $rootFileDir/photo/ */
+    private String savedPhotoDir;
+
     private float crop_photo_wh_ratio;
     /*裁剪图片的常见宽高比*/
     private float CROP_PHOTO_16W9H_RATIO = 1.7778f;
@@ -53,7 +64,37 @@ public class viApplication extends Application{
         main_2_btn_size = (int)(r.getDimension(com.kairong.vision_recognition.R.dimen.main_2_btn_size));
         main_1_btn_size = (int)(r.getDimension(com.kairong.vision_recognition.R.dimen.main_1_btn_size));
     }
+    public static void initViApp(Application app){
+        if(viApp == null){
+            viApp = (viApplication)app;
+        }
+    }
+    public static viApplication getViApp(){
+        return viApp;
+    }
+    public boolean initDirPath(){
+        if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)&&
+                !Environment.getExternalStorageState().equals(Environment.MEDIA_SHARED)){
+            return false;
+        }
+        File dir = new File(Environment.getExternalStorageDirectory(), "VisionIntuition");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        rootFileDir = dir.getPath();
+        File tempdir = new File(dir,"temp");
+        if(!tempdir.exists()){
+            tempdir.mkdir();
+        }
+        tempFileDir = tempdir.getPath();
+        File photodir = new File(dir,"photo");
+        if(!photodir.exists()){
+            photodir.mkdir();
+        }
+        savedPhotoDir = photodir.getPath();
 
+        return true;
+    }
     public String getAppName(){
         return APP_NAME;
     }
@@ -120,16 +161,18 @@ public class viApplication extends Application{
     public int getIMAGE_LOAD_IN_MEM_MAX_SIZE(){
         return this.IMAGE_LOAD_IN_MEM_MAX_SIZE;
     }
-    public float getCROP_PHOTO_WH_RATIO(String tag){
-        if(tag.contains("16:9")) {crop_photo_wh_ratio = CROP_PHOTO_16W9H_RATIO;}
-        else if(tag.contains("9:16")) {crop_photo_wh_ratio = CROP_PHOTO_9W16H_RATIO;}
-        else if(tag.contains("3:2"))  {crop_photo_wh_ratio = CROP_PHOTO_3W2H_RATIO;}
-        else if(tag.contains("2:3"))  {crop_photo_wh_ratio = CROP_PHOTO_2W3H_RATIO;}
-        else if(tag.contains("4:3"))  {crop_photo_wh_ratio = CROP_PHOTO_4W3H_RATIO;}
-        else if(tag.contains("3:4"))  {crop_photo_wh_ratio = CROP_PHOTO_3W4H_RATIO;}
-        return this.crop_photo_wh_ratio;
+    public String getRootFileDir(){
+        return rootFileDir;
     }
 
-    public static viApplication viApp = null;
+    public String getSavedPhotoDir() {
+        return savedPhotoDir;
+    }
+
+    public String getTempFileDir() {
+        return tempFileDir;
+    }
+
+    private static viApplication viApp = null;
 
 }
