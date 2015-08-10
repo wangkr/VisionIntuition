@@ -89,7 +89,8 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
             }
         });
-        myanimation = new myAnimations(app,composerButtonWrapper,myAnimations.CENTERTOP,380,30,120);
+        int radius = Math.round(viApplication.getViApp().getScreenWidth()*1.0f/3);
+        myanimation = new myAnimations(app,composerButtonWrapper,myAnimations.CENTERTOP,radius,30,120);
         composerButtonShowHideButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

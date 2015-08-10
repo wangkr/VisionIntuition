@@ -112,10 +112,10 @@ public class CropImageActivity extends Activity{
                 showMaxHeight);
         recievedPhoto = BitmapUtil.decodeSampledBitmapFromFile(bitmapIntent.getBitmappath(), load_size);
 
-        // 裁剪宽高比初始化
-        cropRatioInit();
         // 选项列表的初始化
         cropListInit();
+        // 裁剪宽高比初始化
+        cropRatioInit();
 
     }
 
@@ -300,6 +300,7 @@ public class CropImageActivity extends Activity{
             }
             crop_wh_adapter = new SimpleAdapter(this,getData(vlist_image,vlist_text),R.layout.crop_wh_ratio_vlist,
                     new String[] {"vlist_image","vlist_text"},new int[] {R.id.vlist_image,R.id.vlist_text});
+            crop_wh_ratio_drop_down_listView.setAdapter(crop_wh_adapter);
         } else {// 自由比例模式
             crop_wh_ratio_text.setText("自由比例");
             crop_wh_ratio_text.setTextColor(Color.rgb(128, 128, 128));

@@ -6,7 +6,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
-    android:background="@color/activity_background_color"
+    android:background="@drawable/main_bg_layer_list"
     android:theme="@android:style/Theme.NoTitleBar">
     <!-- Octopus标题布局-->
     <RelativeLayout
@@ -35,12 +35,12 @@
             />
     </RelativeLayout>
     <!-- Octopus背景-->
-    <ImageView
-        android:layout_width="@dimen/main_mascot_width"
-        android:layout_height="@dimen/main_mascot_height"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:background="@mipmap/octopus_main" />
+    <!--<ImageView-->
+        <!--android:layout_width="@dimen/main_mascot_width"-->
+        <!--android:layout_height="@dimen/main_mascot_height"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:background="@mipmap/octopus_main" />-->
     <!-- 打开图片按钮布局-->
     <RelativeLayout
         android:layout_width="@dimen/open_pic_layout_width"

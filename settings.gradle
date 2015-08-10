@@ -1,1 +1,1 @@
-include ':app', 'VisionSDKClientLib'
+include ':app'
