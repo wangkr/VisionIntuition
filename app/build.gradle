@@ -27,11 +27,13 @@ android {
     productFlavors {
     }
 }
-repositories{
+repositories {
     mavenCentral();
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(':gpuimage')
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:support-v4:22.2.0'
 }

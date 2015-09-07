@@ -34,11 +34,6 @@ public final class CameraUtil {
     // 后置相机支持的图片尺寸列表
     private static List<Map<String,Object>> supportedPictureSizesBack = null;
 
-    // 摄像头位置
-    // 前置摄像头
-    public static final int CAMERA_FRONT = 0;
-    // 后置摄像头
-    public static final int CAMERA_BACK = 1;
 
     private static final String KEY_VALUE = "value";
     private static final String KEY_RATIO = "ratio";
@@ -129,8 +124,8 @@ public final class CameraUtil {
      * @return
      */
     public Size getMaxPreviewSize(int cameraPosition){
-        if(CAMERA_FRONT == cameraPosition){ return (Size)supportedPreviewSizesFront.get(0).get(KEY_VALUE);}
-        if(CAMERA_BACK == cameraPosition){ return (Size)supportedPreviewSizesBack.get(0).get(KEY_VALUE);}
+        if(Camera.CameraInfo.CAMERA_FACING_FRONT == cameraPosition){ return (Size)supportedPreviewSizesFront.get(0).get(KEY_VALUE);}
+        if(Camera.CameraInfo.CAMERA_FACING_BACK == cameraPosition){ return (Size)supportedPreviewSizesBack.get(0).get(KEY_VALUE);}
         return null;
     }
 
@@ -140,8 +135,8 @@ public final class CameraUtil {
      * @return
      */
     public Size getMinPreviewSize(int cameraPosition){
-        if(CAMERA_FRONT == cameraPosition){ return (Size)supportedPreviewSizesFront.get(supportedPreviewSizesFront.size()-1).get(KEY_VALUE);}
-        if(CAMERA_BACK == cameraPosition){ return (Size)supportedPreviewSizesBack.get(supportedPreviewSizesBack.size()-1).get(KEY_VALUE);}
+        if(Camera.CameraInfo.CAMERA_FACING_FRONT == cameraPosition){ return (Size)supportedPreviewSizesFront.get(supportedPreviewSizesFront.size()-1).get(KEY_VALUE);}
+        if(Camera.CameraInfo.CAMERA_FACING_BACK == cameraPosition){ return (Size)supportedPreviewSizesBack.get(supportedPreviewSizesBack.size()-1).get(KEY_VALUE);}
         return null;
     }
 
@@ -151,8 +146,8 @@ public final class CameraUtil {
      * @return
      */
     public Size getMaxPictureSize(int cameraPosition){
-        if(CAMERA_FRONT == cameraPosition){ return (Size)supportedPictureSizesFront.get(0).get(KEY_VALUE);}
-        if(CAMERA_BACK == cameraPosition){ return (Size)supportedPictureSizesBack.get(0).get(KEY_VALUE);}
+        if(Camera.CameraInfo.CAMERA_FACING_FRONT == cameraPosition){ return (Size)supportedPictureSizesFront.get(0).get(KEY_VALUE);}
+        if(Camera.CameraInfo.CAMERA_FACING_BACK == cameraPosition){ return (Size)supportedPictureSizesBack.get(0).get(KEY_VALUE);}
         return null;
     }
 
@@ -162,8 +157,8 @@ public final class CameraUtil {
      * @return
      */
     public Size getMinPictureSize(int cameraPosition){
-        if(CAMERA_FRONT == cameraPosition){ return (Size)supportedPictureSizesFront.get(supportedPictureSizesFront.size()-1).get(KEY_VALUE);}
-        if(CAMERA_BACK == cameraPosition){ return (Size)supportedPictureSizesBack.get(supportedPictureSizesBack.size()-1).get(KEY_VALUE);}
+        if(Camera.CameraInfo.CAMERA_FACING_FRONT == cameraPosition){ return (Size)supportedPictureSizesFront.get(supportedPictureSizesFront.size()-1).get(KEY_VALUE);}
+        if(Camera.CameraInfo.CAMERA_FACING_BACK == cameraPosition){ return (Size)supportedPictureSizesBack.get(supportedPictureSizesBack.size()-1).get(KEY_VALUE);}
         return null;
     }
 
@@ -173,17 +168,17 @@ public final class CameraUtil {
      * @param ratio:图片宽高比例{@code null}
      * @return
      */
-    public Size getPreviewSizeByRatio(int cameraPosition,String ratio){
+    public Size getMaxPreviewSizeOfRatio(int cameraPosition, String ratio){
         int idx = 0;
         Map<String,Object> map = null;
-        if(CAMERA_FRONT == cameraPosition){
+        if(Camera.CameraInfo.CAMERA_FACING_FRONT == cameraPosition){
             int size = supportedPreviewSizesFront.size();
             for(int i = size - 1;i >= 0;i--){
                 map = supportedPreviewSizesFront.get(i);
                 if(((String)map.get(KEY_RATIO)).contains(ratio))return (Size)map.get(KEY_VALUE);
             }
         }
-        if(CAMERA_BACK == cameraPosition){
+        if(Camera.CameraInfo.CAMERA_FACING_BACK == cameraPosition){
             int size = supportedPreviewSizesBack.size();
             for(int i = size - 1;i >= 0;i--){
                 map = supportedPreviewSizesBack.get(i);
@@ -193,23 +188,34 @@ public final class CameraUtil {
         return null;
     }
 
+    public List<Size> getAllPictureSizeOfRatio(int cameraPosition,String ratio){
+        List<Size> list = new ArrayList<>();
+        if(cameraPosition == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            for (int i = 0; i < supportedPictureSizesBack.size(); i++) {
+                if (supportedPictureSizesBack.get(i).get(KEY_RATIO).equals(ratio)) {
+                    list.add((Size) supportedPictureSizesBack.get(i).get(KEY_VALUE));
+                }
+            }
+        }
+        return list;
+    }
     /**
      * 根据图片的宽高比来查找对应摄像头的存储图片分辨率:默认从高到低查询
      * @param cameraPosition:相机位置
      * @param ratio:图片宽高比例{@code null}
      * @return
      */
-    public Size getPictureSizeByRatio(int cameraPosition,String ratio){
+    public Size getMaxPictureSizeOfRatio(int cameraPosition, String ratio){
         int idx = 0;
         Map<String,Object> map = null;
-        if(CAMERA_FRONT == cameraPosition){
+        if(Camera.CameraInfo.CAMERA_FACING_FRONT == cameraPosition){
             int size = supportedPictureSizesFront.size();
             for(int i = size - 1;i >=0 ;i--){
                 map = supportedPictureSizesFront.get(i);
                 if(((String)map.get(KEY_RATIO)).contains(ratio))return (Size)map.get(KEY_VALUE);
             }
         }
-        if(CAMERA_BACK == cameraPosition){
+        if(Camera.CameraInfo.CAMERA_FACING_BACK == cameraPosition){
             int size = supportedPictureSizesBack.size();
             for(int i = size - 1;i >=0 ;i--){
                 map = supportedPictureSizesBack.get(i);

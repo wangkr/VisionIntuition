@@ -27,7 +27,7 @@
             android:layout_width="@dimen/take_photo_mode_list_width"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_bar_height"
-            android:background="@drawable/background_with_frame_line"
+            android:background="@drawable/background_with_stroke"
             android:divider="@color/vi_blue_color"
             android:dividerHeight="1px"
             android:layout_centerHorizontal="true"
@@ -46,9 +46,10 @@
                 android:layout_height="@dimen/take_photo_mode_btn_height"
                 android:layout_centerVertical="true"
                 android:orientation="horizontal"
+                android:onClick="onClick"
                 android:layout_centerInParent="true"
                 android:gravity="center"
-                android:background="@drawable/background_with_frame_line">
+                android:background="@drawable/background_with_stroke">
                 <TextView
                     android:id="@+id/take_photo_mode_text"
                     android:layout_width="wrap_content"
@@ -84,6 +85,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
+                android:onClick="onClick"
                 android:id="@+id/btn_take_photo_gallery"
                 android:src="@drawable/btn_take_photo_gallery"/>
             <ImageView
@@ -92,6 +94,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true"
+                android:onClick="onClick"
                 android:id="@+id/btn_camera_change"
                 android:src="@drawable/btn_take_photo_camera_change"/>
             <ImageView
@@ -99,6 +102,7 @@
                 android:layout_width="@dimen/shutter_btn_size"
                 android:layout_height="@dimen/shutter_btn_size"
                 android:layout_centerInParent="true"
+                android:onClick="onClick"
                 android:src="@drawable/btn_take_photo"/>
         </RelativeLayout>
         <!-- 切换拍照模式提示信息 布局-->
@@ -150,32 +154,33 @@
             android:background="@color/layout_bar_color"
             android:paddingLeft="@dimen/layout_bar_vPadding"
             android:paddingRight="@dimen/layout_bar_vPadding"
+            android:gravity="center_vertical"
             >
             <!-- 按钮“存储”-->
-            <Button
+            <TextView
                 android:id="@+id/btn_preview_photo_ok"
                 android:layout_width="@dimen/layout_bar_btn_width"
                 android:layout_height="@dimen/layout_bar_btn_height"
                 android:background="@drawable/btn_bg"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
                 android:text="@string/btn_take_photo_ok_text"
                 android:textColor="@android:color/holo_blue_dark"
                 android:textSize="@dimen/photo_preview_ok_btnTextSize"
-                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:onClick="onClick"
                 />
             <!-- 按钮“放弃”-->
-            <Button
+            <TextView
                 android:id="@+id/btn_preview_photo_cancell"
                 android:layout_width="@dimen/layout_bar_btn_width"
                 android:layout_height="@dimen/layout_bar_btn_height"
                 android:background="@drawable/btn_bg"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:text="@string/btn_take_photo_cancell_text"
                 android:textColor="@android:color/holo_blue_dark"
                 android:textSize="@dimen/photo_preview_ok_btnTextSize"
-                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:gravity="center"
+                android:onClick="onClick"
                 />
         </RelativeLayout>
     </RelativeLayout>

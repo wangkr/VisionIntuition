@@ -12,10 +12,12 @@
     <dimen name="main_mascot_width">240dp</dimen>
     <dimen name="main_mascot_height">240dp</dimen>
     <dimen name="open_pic_layout_width">170dp</dimen>
-    <dimen name="main_1_cb_pressedRingWidth">6dp</dimen>
+    <dimen name="main_1_cb_pressedRingWidth">5dp</dimen>
+    <dimen name="main_2_cb_pressedRingWidth">3dp</dimen>
     <dimen name="main_1_btn_size">84dp</dimen>
     <dimen name="main_2_btn_size">60dp</dimen>
-    <dimen name="icn_plus_size">38dp</dimen>
+    <dimen name="main_3_btn_size">40dp</dimen>
+    <dimen name="icn_plus_size">35dp</dimen>
     <dimen name="title_text_size">60sp</dimen>
     <dimen name="title_text_bk_size">62sp</dimen>
     <dimen name="octopus_layout_marTop">50dp</dimen>
@@ -86,6 +88,8 @@
     <!-- auto_recog_activity-->
     <dimen name="auto_top_bar_btn_width">56dp</dimen>
     <dimen name="auto_top_bar_btn_height">32dp</dimen>
+    <dimen name="auto_title_bar_height">60dp</dimen>
     <dimen name="auto_tabhost_height">260dp</dimen>
     <dimen name="tabwidget_height">40dp</dimen>
+    <dimen name="empty_area_width">15dp</dimen>
 </resources>

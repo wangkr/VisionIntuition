@@ -3,6 +3,7 @@ package com.kairong.viUIControls.viCamera;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -10,10 +11,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -22,19 +25,10 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
-import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
-import android.hardware.Camera.AutoFocusCallback;
-import android.hardware.Camera.Parameters;
-import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.Size;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.RotateAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -44,7 +38,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kairong.sensorDetector.ScrnOrientDetector;
-import com.kairong.viUIControls.circleProgress.CircleProgress;
 import com.kairong.viUIControls.viCropImage.CropImageActivity;
 import com.kairong.viUtils.BitmapUtil;
 import com.kairong.viUtils.CameraUtil;
@@ -53,10 +46,7 @@ import com.kairong.vision_recognition.R;
 import com.kairong.sensorDetector.ShakeDetector;
 import com.kairong.vision_recognition.viApplication;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,43 +60,33 @@ import java.util.Map;
  * mail:wangkrhust@gmail.com
  */
 public class viCameraActivity extends Activity implements SurfaceHolder.Callback,View.OnClickListener {
-    private SurfaceView surface = null;
-    private SurfaceHolder holder = null;
-    private Camera camera = null;                       // 声明相机
-    private int cameraPosition = 1;                     // 摄像头位置：0代表前置摄像头，1代表后置摄像头
+    private volatile CameraHelper cameraHelper;
+    private SurfaceView surface;
+    private SurfaceHolder holder;
     private int scrnOrient = 90;                        // 当前屏幕朝向
     private int picTakenScrnOrient = 0;                 // 拍照时的手机屏幕朝向
     private int current_mode = -1;                      // 当前拍照模式
-    private volatile int save_photo_state = -1;         // 照片保存状态
 
-    private ImageView focus_view = null;                // 显示对焦光标
-    private ImageView btn_shutter = null;               // 快门按钮
-    private ImageView btn_gallery = null;               // 相册方式获取
-    private ImageView btn_camera_change = null;         // 切换相机
-    private ImageView previewing_barrier = null;        // 预览照片遮幅
-    private ImageView switch_mode_hint = null;          // 切换拍照模式提示
-    private ProgressDialog progressDialog = null;
+    private ImageView focus_view;                // 显示对焦光标
+    private ImageView btn_shutter;               // 快门按钮
+    private ImageView btn_gallery;               // 相册方式获取
+    private ImageView btn_camera_change;         // 切换相机
+    private ImageView previewing_barrier;        // 预览照片遮幅
+    private ImageView switch_mode_hint;          // 切换拍照模式提示
+    private ProgressDialog progressDialog;
     // 各个布局的引用
-    private RelativeLayout take_photo_rl = null;
-    private RelativeLayout preview_photo_rl  = null;
+    private RelativeLayout take_photo_rl;
+    private RelativeLayout preview_photo_rl ;
 
-    private ListView take_photo_mode_listView = null;
-    private volatile String tmpPhotoPath = null;
-    private Parameters photoParameters = null;
-    private CameraUtil cameraUtil = null;
+    private ListView take_photo_mode_listView;
     /*晃动检测器—用于检测摄像头剧烈晃动，从而启动自动聚焦*/
-    private ShakeDetector shakeDetector = null;
+    private ShakeDetector shakeDetector;
     /*屏幕方向检测器，用于监测屏幕的旋转*/
-    private ScrnOrientDetector scrnOrientDetector = null;
+    private ScrnOrientDetector scrnOrientDetector;
     /*相机请求*/
-    private CameraRequest cameraRequest = null;
+    private CameraRequest cameraRequest;
     /*头像模式拍照比例*/
     private static final float HUMAN_MODE_WH_RATIO = 1.0f;
-
-    /*是否正在预览*/
-    private boolean isPreviewing = false;
-    /*是否对焦成功*/
-    private boolean isFocused = false;
     /*停止保存照片线程*/
     private boolean ifStopCPThread = false;
     /*拍照模式列表是否可见*/
@@ -114,23 +94,11 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     /*拍照遮幅可见标志*/
     private boolean isBarrierShown = false;
 
-    // 对焦标志读写锁标志
-    public static int Focus_State_Read = 111;
-    public static int Focus_State_Write = 222;
     /*拍照遮幅高度*/
     private int barrier_height = 0;
-    // 控件信号量
-    /*显示对焦状态*/
-    private final static int MSG_FOCUSING = 3234;
-    private final static int MSG_FOCUSED = 3235;
-    private final static int MSG_FOCUS_FAILED = 3236;
     /*显示进程状态*/
     private final static int STOP_PROGRESS = 3238;
     private static final int REQUEST_CODE_PICK_IMAGE = 3037;
-    /*照片保存状态*/
-    public final static int SAVING_PHOTO = 3323;
-    public final static int SAVED_PHOTO = 3324;
-    public final static int SAVED_ERROR = 3325;
     //手机屏幕的旋转方向
     /*水平方向*/
     public static final int ORIENTATION_LAND = 0;
@@ -142,6 +110,9 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     public static final int ORIENTATION_REV_PORTRAIT = 270;
     /*屏幕发生旋转信号*/
     public static final int ORIENTATION_ROTATED = 1234;
+
+    // 线程共享变量
+    public static ShareData save_photo_state = new ShareData();
 
     private final String TAG = "viCameraActivity";
     private final static String[] vlist_text_mode = new String[]{"自动模式","风景模式","头像模式"};
@@ -155,23 +126,29 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.take_photo_activity);
-
+        initCameraHelper();
+        setScreen();//拍照过程屏幕一直处于高亮
         // 获取源Activity的相机请求
         cameraRequest = (CameraRequest)getIntent().getSerializableExtra("cameraRequest");
-        cameraUtil = CameraUtil.getCameraUtil();
-        setScreen();//拍照过程屏幕一直处于高亮
-
         // 获取相机模式
         current_mode = cameraRequest.getPhotoMode();
         // 初始化视图
         initView();
         setTakePhotoLayout();
     }
+    // 初始化cameraHelper
+    private void initCameraHelper(){
+        surface = (SurfaceView)findViewById(R.id.surfaceview);
+        holder = surface.getHolder();   //获得句柄
+        holder.addCallback(this);       //添加回调
+        // surfaceview不维护自己的缓冲区，等待屏幕渲染引擎将内容推送到用户面前
+        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        cameraHelper = new CameraHelper(this,holder);
+    }
     // 初始化视图资源
     private void initView(){
         // 设置控件资源ID
-        TextView btn_preview_photo_ok = (TextView)findViewById(R.id.btn_preview_photo_ok);
-        TextView btn_preview_photo_cancell = (TextView)findViewById(R.id.btn_preview_photo_cancell);
         TextView mode_text = (TextView)findViewById(R.id.take_photo_mode_text);
         LinearLayout take_photo_mode_ll = (LinearLayout)findViewById(R.id.take_photo_mode_btn_layout);
         // 全局控件初始化
@@ -181,23 +158,11 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         focus_view = (ImageView)findViewById(R.id.focus);
         previewing_barrier = (ImageView)findViewById(R.id.take_photo_barrier);
         switch_mode_hint = (ImageView)findViewById(R.id.switch_mode_hint_view);
-        surface = (SurfaceView)findViewById(R.id.surfaceview);
-        holder = surface.getHolder();   //获得句柄
-        holder.addCallback(this);       //添加回调
-        // surfaceview不维护自己的缓冲区，等待屏幕渲染引擎将内容推送到用户面前
-        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
 
         take_photo_rl = (RelativeLayout)findViewById(R.id.take_photo_layout);
         preview_photo_rl = (RelativeLayout)findViewById(R.id.preview_photo_layout);
         take_photo_mode_listView = (ListView)findViewById(R.id.take_photo_mode_list);
-
-        // 设置控件监听
-        btn_shutter.setOnClickListener(this);
-        btn_camera_change.setOnClickListener(this);
-        btn_gallery.setOnClickListener(this);
-        btn_preview_photo_cancell.setOnClickListener(this);
-        btn_preview_photo_ok.setOnClickListener(this);
-        take_photo_mode_ll.setOnClickListener(this);
 
         // 只有自动模式下才有显示让用户选择的菜单的必要
         if(cameraRequest.getPhotoMode()==TakePhotoMode.AUTO_MODE) {
@@ -231,9 +196,8 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                 surfaceRect.bottom -= photo_bar_height;
                 float m_X = motionEvent.getX(0);
                 float m_Y = motionEvent.getY(0);
-                if (isPreviewing && cameraPosition == 1 && surfaceRect.contains((int) m_X, (int) m_Y)) {
-                    handler.sendEmptyMessage(MSG_FOCUSING);
-                    camera.autoFocus(autoFocusCallback);
+                if (cameraHelper.isPreviewing() && cameraHelper.getCamera_position()==Camera.CameraInfo.CAMERA_FACING_BACK && surfaceRect.contains((int) m_X, (int) m_Y)) {
+                    cameraHelper.autoFocus(handler);
                 }
                 // 拍照模式菜单弹回
                 if (modevlist_visible) {
@@ -258,16 +222,16 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         public void handleMessage(Message msg) {
             viCameraActivity theActivity = mActivity.get();
             switch (msg.what) {
-                case MSG_FOCUSING:
-                    if (theActivity.cameraPosition == 1&&theActivity.isPreviewing)
+                case CameraHelper.MSG_FOCUSING:
+                    if (theActivity.cameraHelper.getCamera_position() == Camera.CameraInfo.CAMERA_FACING_BACK&&theActivity.cameraHelper.isPreviewing())
                         theActivity.focus_view.setBackgroundResource(R.drawable.focus_focusing);
                     break;
-                case MSG_FOCUSED:
-                    if (theActivity.cameraPosition == 1&&theActivity.isPreviewing)
+                case CameraHelper.MSG_FOCUSED:
+                    if (theActivity.cameraHelper.getCamera_position() == Camera.CameraInfo.CAMERA_FACING_BACK&&theActivity.cameraHelper.isPreviewing())
                         theActivity.focus_view.setBackgroundResource(R.drawable.focus_focused);
                     break;
-                case MSG_FOCUS_FAILED:
-                    if (theActivity.cameraPosition == 1&&theActivity.isPreviewing)
+                case CameraHelper.MSG_FOCUS_FAILED:
+                    if (theActivity.cameraHelper.getCamera_position() == Camera.CameraInfo.CAMERA_FACING_BACK&&theActivity.cameraHelper.isPreviewing())
                         theActivity.focus_view.setBackgroundResource(R.drawable.focus_focus_failed);
                     break;
                 case ORIENTATION_ROTATED:
@@ -287,12 +251,9 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     ShakeDetector.OnShakeListener onShakeListener = new ShakeDetector.OnShakeListener() {
         @Override
         public void onShake() {
-            focuseState(Focus_State_Write, false);
-            if(cameraPosition == 1&&isPreviewing){
-                if(camera!=null){
-                    handler.sendEmptyMessage(MSG_FOCUSING);
-                    camera.autoFocus(autoFocusCallback);
-                }
+            if(cameraHelper.getCamera_position() == Camera.CameraInfo.CAMERA_FACING_BACK&&cameraHelper.isPreviewing()){
+                cameraHelper.autoFocus(handler);
+
             }
         }
     };
@@ -341,7 +302,13 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                 break;
             case R.id.btn_camera_change:
                 // 切换前后摄像头
-                switchCamera();
+                cameraHelper.switchCamera();
+                if(cameraHelper.getCamera_position()==Camera.CameraInfo.CAMERA_FACING_BACK){
+                    focus_view.setVisibility(View.VISIBLE);
+                    cameraHelper.autoFocus(handler);
+                }else{
+                    focus_view.setVisibility(View.GONE);
+                }
                 break;
             case R.id.btn_take_photo:
                 // 拍照
@@ -382,21 +349,6 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         return list;
 
     }
-    AutoFocusCallback autoFocusCallback = new AutoFocusCallback(){
-
-        @Override
-        public void onAutoFocus(boolean success, Camera camera) {
-            // TODO Auto-generated method stub
-            Message msg = Message.obtain();
-            if (success) {
-                msg.what = MSG_FOCUSED;
-            } else {
-                msg.what = MSG_FOCUS_FAILED;
-            }
-            handler.sendMessage(msg);
-            focuseState(Focus_State_Write, success);
-        }
-    };
 
     @Override
     public void surfaceChanged(SurfaceHolder holder,int format, int width, int height){
@@ -405,43 +357,32 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        if(camera == null){
-            // 默认打开后置摄像头
-            camera = Camera.open();
-            try {
-                // 设置摄像头参数
-                setCameraParameter(CameraUtil.CAMERA_BACK);
-
-                camera.setPreviewDisplay(holder);// 通过surfaceview显示取景画面
-                camera.setDisplayOrientation(90);
-                camera.startPreview();// 开始预览
-
-                isPreviewing = true;
-
-                shakeDetector = new ShakeDetector(this);
-                scrnOrientDetector = new ScrnOrientDetector(this);
-
-                shakeDetector.registerOnShakeListener(onShakeListener);
-                scrnOrientDetector.registerOnShakeListener(onSrcnListener);
-                // 启动监听
-                shakeDetector.start();
-                scrnOrientDetector.start();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String defCam = sharedPreferences.getString(getResources().getString(R.string.def_cam_key),"1");
+        if(defCam.equals("0")){
+            cameraHelper.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+        }else if (defCam.equals("1")){
+            cameraHelper.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+            focus_view.setVisibility(View.GONE);
+        }else {
+            cameraHelper.open();
         }
+
+        cameraHelper.autoFocus(handler);
+        shakeDetector = new ShakeDetector(this);
+        scrnOrientDetector = new ScrnOrientDetector(this);
+
+        shakeDetector.registerOnShakeListener(onShakeListener);
+        scrnOrientDetector.registerOnShakeListener(onSrcnListener);
+        // 启动监听
+        shakeDetector.start();
+        scrnOrientDetector.start();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         // 置预览回调为空，再关闭预览
-        if(camera!=null) {
-            camera.setPreviewCallback(null);
-            camera.stopPreview();
-            camera.release();
-            camera = null;
-            isPreviewing = false;
-        }
+        cameraHelper.stop();
         // 最后关掉震动检测器和自动对焦
         shakeDetector.stop();
         scrnOrientDetector.stop();
@@ -456,131 +397,35 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         btn_gallery.setRotation(90 - scrnOrient);
         btn_camera_change.setRotation(90 - scrnOrient);
     }
-    /**
-     *切换前置或者后置摄像头
-     */
-    private void switchCamera(){
-        int cameraCount = 0;
-        CameraInfo cameraInfo = new CameraInfo();
-        cameraCount = Camera.getNumberOfCameras();//得到摄像头的个数
-        if(cameraCount <= 1){
-            Toast.makeText(viCameraActivity.this,"系统只检测到一个摄像头",Toast.LENGTH_LONG).show();
-            return;
-        }
-        for(int i = 0; i < cameraCount;i++) {
-            Camera.getCameraInfo(i, cameraInfo);//得到每一个摄像头的信息
-            if(cameraPosition == 1) {
-                //现在是后置，变更为前置
-                if(cameraInfo.facing  == Camera.CameraInfo.CAMERA_FACING_FRONT) {//代表摄像头的方位，CAMERA_FACING_FRONT前置      CAMERA_FACING_BACK后置
-                    cameraPosition = 0;
-                    camera.stopPreview();//停掉原来摄像头的预览
-                    camera.release();   //释放资源
-                    camera = null;      //取消原来摄像头
-                    camera = Camera.open(i);//打开当前选中的摄像头
-
-                    // 设置摄像头参数
-                    setCameraParameter(CameraUtil.CAMERA_FRONT);
-
-                    try {
-                        camera.setPreviewDisplay(holder);//通过surfaceview显示取景画面
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    camera.setDisplayOrientation(90);
-                    camera.startPreview();//开始预览
-                    focuseState(Focus_State_Write,true);
-                    focus_view.setVisibility(View.INVISIBLE);
-                    break;
-                }
-            } else {
-                //现在是前置， 变更为后置
-                if(cameraInfo.facing  == Camera.CameraInfo.CAMERA_FACING_BACK) {//代表摄像头的方位，CAMERA_FACING_FRONT前置      CAMERA_FACING_BACK后置
-                    camera.stopPreview();//停掉原来摄像头的预览
-                    camera.release();//释放资源
-                    camera = null;//取消原来摄像头
-                    camera = Camera.open(i);//打开当前选中的摄像头
-
-                    try {
-                        camera.setPreviewDisplay(holder);//通过surfaceview显示取景画面
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    // 设置摄像头参数
-                    setCameraParameter(CameraUtil.CAMERA_BACK);
-
-                    camera.setDisplayOrientation(90);
-                    camera.startPreview();//开始预览
-                    cameraPosition = 1;
-                    focuseState(Focus_State_Write,false);
-                    camera.autoFocus(autoFocusCallback);
-                    focus_view.setVisibility(View.VISIBLE);
-                    break;
-                }
-            }
-
-        }
-    }
-
     private void openGallery(){
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");//相片类型
         startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
     }
-
-    private void setCameraParameter(int cameraPosition){
-        photoParameters = camera.getParameters();
-
-        if(cameraPosition == CameraUtil.CAMERA_FRONT){
-            photoParameters.set("rotation",90);
-        }
-
-        int screenW = viApplication.getViApp().getScreenWidth();
-        int screenH = viApplication.getViApp().getScreenHeight();
-        // 获取屏幕宽高比
-        String srcnRatio = CameraUtil.getWHratioString(screenH,screenW);
-        Size preSize = cameraUtil.getPreviewSizeByRatio(cameraPosition, srcnRatio);
-        Size picSize = cameraUtil.getPictureSizeByRatio(cameraPosition, srcnRatio);
-        try {
-            photoParameters.setPreviewSize(preSize.width, preSize.height);
-            photoParameters.setPictureSize(picSize.width, picSize.height);
-        }catch (NullPointerException e){
-            e.printStackTrace();
-            String msg = "Camera Parameters setting error!";
-            Toast.makeText(this, msg ,Toast.LENGTH_SHORT).show();
-            Log.e(TAG, msg);
-            photoParameters.setPreviewSize(screenH,screenW);
-            photoParameters.setPictureSize(screenH,screenW);
-        }
-
-        camera.setParameters(photoParameters);
-    }
-
     /**
      * 拍照
      */
     private void takePhoto(){
-        if(cameraPosition == 0||focuseState(Focus_State_Read,false)) {
+        if(cameraHelper.getCamera_position() == Camera.CameraInfo.CAMERA_FACING_FRONT || cameraHelper.isFocused()) {
             picTakenScrnOrient = scrnOrient;
-            save_photo_state = SAVING_PHOTO;
             progressDialog = ProgressDialog.show(this,null,"正在处理...",true,false);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    camera.takePicture(null,null,jpeg);
+                    cameraHelper.takePhoto(picTakenScrnOrient, barrier_height);
                 }
             }).start();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while(!ifStopCPThread){
-                        if(save_photo_state == SAVED_PHOTO){
+                        if(cameraHelper.getSave_photo_state() == CameraHelper.SAVED_PHOTO){
+                            handler.sendEmptyMessage(STOP_PROGRESS);
                             // 保存图片完成后进行图片处理
                             if(cameraRequest.ifCrop()){
                                 // 转到裁剪Activity
                                 Intent intent = new Intent(getApplicationContext(), CropImageActivity.class);
-                                BitmapIntent bitmapIntent = new BitmapIntent(tmpPhotoPath);
+                                BitmapIntent bitmapIntent = new BitmapIntent(cameraHelper.getTmpPhotoPath());
                                 Bundle bundle = new Bundle();
                                 bundle.putSerializable("cameraRequest", cameraRequest);
                                 bundle.putSerializable("bitmapIntent", bitmapIntent);
@@ -589,16 +434,17 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                                 finish();
                             } else {
                                 take_photo_rl.setVisibility(View.INVISIBLE);
-                                viSize load_size = BitmapUtil.getImageReq(tmpPhotoPath, viApplication.getViApp().getScreenWidth(),
+                                viSize load_size = BitmapUtil.getImageReq(cameraHelper.getTmpPhotoPath(), viApplication.getViApp().getScreenWidth(),
                                         viApplication.getViApp().getScreenHeight() - 2*getResources().getDimensionPixelSize(R.dimen.layout_bar_height));
-                                Bitmap preview_photo = BitmapUtil.decodeSampledBitmapFromFile(tmpPhotoPath, load_size);
+                                Bitmap preview_photo = BitmapUtil.decodeSampledBitmapFromFile(cameraHelper.getTmpPhotoPath(), load_size);
                                 ((ImageView)preview_photo_rl.findViewById(R.id.take_photo_preview)).setImageBitmap(preview_photo);
                                 preview_photo_rl.setVisibility(View.VISIBLE);
                             }
                             break;
-                        } else if(save_photo_state == SAVED_ERROR){//保存发生错误
+                        } else if(cameraHelper.getSave_photo_state() == CameraHelper.SAVED_ERROR){//保存发生错误
                             // 先停止等待动画
                             handler.sendEmptyMessage(STOP_PROGRESS);
+                            cameraHelper.restartPreview();
                         }
                     }
                 }
@@ -686,13 +532,13 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                     // 显示切换提示
                     (findViewById(R.id.switch_mode_hint_layout)).setVisibility(View.VISIBLE);
                     setBarrierAnimation(false);
-                    isPreviewing = false;
+//                    isPreviewing = false;
                     btn_shutter.setImageResource(R.drawable.photo_take_button_disable);
                     btn_shutter.setClickable(false);
                 } else {
                     (findViewById(R.id.switch_mode_hint_layout)).setVisibility(View.GONE);
                     setBarrierAnimation(false);
-                    isPreviewing = true;
+//                    isPreviewing = true;
                     btn_shutter.setImageResource(R.drawable.btn_take_photo);
                     btn_shutter.setClickable(true);
                 }
@@ -703,14 +549,14 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                     switch_mode_hint.setRotation(90 - scrnOrient);
                     // 显示切换提示
                     (findViewById(R.id.switch_mode_hint_layout)).setVisibility(View.VISIBLE);
-                    isPreviewing = false;
+//                    isPreviewing = false;
                     setBarrierAnimation(true);
                     btn_shutter.setImageResource(R.drawable.photo_take_button_disable);
                     btn_shutter.setClickable(false);
                 } else {
                     (findViewById(R.id.switch_mode_hint_layout)).setVisibility(View.GONE);
                     setBarrierAnimation(true);
-                    isPreviewing = true;
+//                    isPreviewing = true;
                     btn_shutter.setImageResource(R.drawable.btn_take_photo);
                     btn_shutter.setClickable(true);
                 }
@@ -731,78 +577,13 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
             isBarrierShown = false;
         }
     }
-    // 创建jpeg图片回调数据对象,对图片进行旋转和初步裁剪
-    PictureCallback jpeg = new PictureCallback() {
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-            camera.stopPreview();
-            isPreviewing = false;
-            Bitmap saved_photo = BitmapFactory.decodeByteArray(data, 0, data.length);
-            // 是否裁剪图片
-            if (cameraRequest.ifCrop()) {
-                /*存储的图片尺寸*/
-                int storeImageWidth = 0, storeImageHeight = 0;
-                /*保存的图片和预览图片的比例*/
-                float ratio = (float)photoParameters.getPictureSize().width/photoParameters.getPreviewSize().width;
-                // 确定最终图片的宽高
-                if (picTakenScrnOrient == ORIENTATION_LAND || picTakenScrnOrient == ORIENTATION_REV_LAND) {
-                    storeImageWidth = saved_photo.getWidth() - 2 * Math.round(getResources().getDimensionPixelSize(R.dimen.layout_bar_height)*ratio);
-                    storeImageHeight = saved_photo.getHeight();
-                } else {
-                    storeImageWidth = saved_photo.getWidth() - Math.round(getResources().getDimensionPixelSize(R.dimen.layout_bar_height)*ratio + barrier_height*ratio);
-                    storeImageHeight = saved_photo.getHeight();
-                }
-                // 对图片进行旋转处理
-                {
-                    // 后置摄像头对照片进行顺时针旋转90度，前置摄像头则逆时针转90度
-                    Matrix matRotate = new Matrix();
-                    if (cameraPosition == 0) {
-                        matRotate.setRotate(-picTakenScrnOrient);
-                    } else {
-                        matRotate.setRotate(picTakenScrnOrient);
-                    }
-                    // 再对图片进行初步剪切
-                    int h = 0, w = Math.round(getResources().getDimensionPixelSize(R.dimen.layout_bar_height) * ratio);
-                    try{
-                        saved_photo = Bitmap.createBitmap(saved_photo, w, h, storeImageWidth, storeImageHeight, null, true);
-                        // 再进行旋转
-                        saved_photo = Bitmap.createBitmap(saved_photo, 0, 0, saved_photo.getWidth(), saved_photo.getHeight(), matRotate, true);
-                    } catch (OutOfMemoryError e){
-                        e.printStackTrace();
-                        System.gc();
-                        save_photo_state = SAVED_ERROR;
-                        return;
-                    }
-
-                }
-                try {
-                    File file = new File(viApplication.getViApp().getTempFileDir() + "//" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) +
-                            ".tmp");
-                    tmpPhotoPath = file.getPath();
-                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-                    saved_photo.compress(Bitmap.CompressFormat.JPEG, 80, bos);
-                    bos.flush();    // 刷新此缓冲区的输出流
-                    bos.close();    // 关闭此输出流并释放与此流有关的所有系统资源
-                    save_photo_state = SAVED_PHOTO;
-                    saved_photo.recycle();
-                    System.gc();
-                }catch (IOException e){
-                    e.printStackTrace();
-                    save_photo_state = SAVED_ERROR;
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                    save_photo_state = SAVED_ERROR;
-                }
-            }
-        }
-    };
 
     /**
      * 存储照片
      */
     private void storePhoto(){
         String filepath = viApplication.getViApp().getSavedPhotoDir() + "//" +  new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".jpg";
-        File srcfile = new File(tmpPhotoPath);
+        File srcfile = new File(cameraHelper.getTmpPhotoPath());
         File newfile = new File(filepath);
         if(!srcfile.exists()||!srcfile.isFile()){
             Toast.makeText(this,"保存文件错误",Toast.LENGTH_SHORT).show();
@@ -813,7 +594,7 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
             Toast.makeText(this,"文件保存成功:\n"+filepath,Toast.LENGTH_SHORT).show();
         }
         // 初始化BitmapIntent
-        BitmapIntent bitmapIntent = new BitmapIntent(tmpPhotoPath);
+        BitmapIntent bitmapIntent = new BitmapIntent(cameraHelper.getTmpPhotoPath());
         Bundle bundle = new Bundle();
         bundle.putSerializable("bitmapIntent",bitmapIntent);
         // 跳转到其他的Activity
@@ -838,33 +619,30 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         take_photo_rl.setVisibility(View.VISIBLE);
         preview_photo_rl.setVisibility(View.INVISIBLE);
         // 只有后置摄像头才能设置聚焦
-        if(cameraPosition == 1) {
+        if(cameraHelper.getCamera_position() == Camera.CameraInfo.CAMERA_FACING_BACK) {
             focus_view.setVisibility(View.VISIBLE);
         }
-        camera.setDisplayOrientation(90);
-        camera.startPreview();
-        isPreviewing = true;
-        camera.autoFocus(autoFocusCallback);
+        cameraHelper.restartPreview();
     }
 
     private void setScreen(){
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//设置全屏
         this.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         WindowManager.LayoutParams lp = this.getWindow().getAttributes();
-        lp.screenBrightness = 255;
+        lp.screenBrightness = 1;
         this.getWindow().setAttributes(lp);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
-    private synchronized boolean focuseState(int ReadOrWrite,boolean value){
-        synchronized (this){
-            if(ReadOrWrite == Focus_State_Read)
-                return isFocused;
-            else if(ReadOrWrite == Focus_State_Write)
-                isFocused = value;
-        }
-        return false;
-    }
+//    private synchronized boolean focuseState(int ReadOrWrite,boolean value){
+//        synchronized (this){
+//            if(ReadOrWrite == Focus_State_Read)
+//                return cameraHelper.isFocused();
+//            else if(ReadOrWrite == Focus_State_Write)
+//                isFocused = value;
+//        }
+//        return false;
+//    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode!=RESULT_OK){
@@ -886,10 +664,9 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
                 Toast.makeText(this, "图片尺寸过大!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            tmpPhotoPath = filepath;
             // 初始化BitmapIntent
-            int orientation = BitmapUtil.readPictureDegree(tmpPhotoPath);
-            BitmapIntent bitmapIntent = new BitmapIntent(orientation,tmpPhotoPath,BitmapIntent.FROM_CAMERA);
+            int orientation = BitmapUtil.readPictureDegree(filepath);
+            BitmapIntent bitmapIntent = new BitmapIntent(orientation,filepath,BitmapIntent.FROM_CAMERA);
             Bundle bundle = new Bundle();
             bundle.putSerializable("bitmapIntent",bitmapIntent);
             if (cameraRequest.ifCrop()) {
@@ -944,9 +721,8 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
     //无意中按返回键时要释放内存
     @Override
     public void onBackPressed() {
-        if(save_photo_state == SAVING_PHOTO){
+        if(cameraHelper.getSave_photo_state() == CameraHelper.SAVING_PHOTO){
             ifStopCPThread = true;
-            save_photo_state = -1;
             return;
         }
         this.finish();
@@ -959,5 +735,14 @@ public class viCameraActivity extends Activity implements SurfaceHolder.Callback
         // 停止等待动画
         handler.sendEmptyMessage(STOP_PROGRESS);
         super.finish();
+    }
+}
+class ShareData{
+    private int value;
+    public synchronized int get(){
+        return value;
+    }
+    public synchronized void set(int value){
+        this.value = value;
     }
 }

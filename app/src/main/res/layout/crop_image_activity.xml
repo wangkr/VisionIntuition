@@ -17,12 +17,11 @@
         android:layout_width="@dimen/crop_drop_down_list_width"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/layout_bar_height"
-        android:background="@drawable/background_with_frame_line"
+        android:background="@drawable/background_with_stroke"
         android:divider="@color/vi_blue_color"
         android:dividerHeight="1px"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:padding="1px"
         android:visibility="invisible">
     </ListView>
     <!-- 标题栏设置-->
@@ -51,7 +50,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:gravity="center"
-            android:background="@drawable/btn_bg">
+            android:background="@drawable/background_with_stroke">
             <TextView
                 android:id="@+id/crop_wh_ratio_text"
                 android:layout_width="wrap_content"

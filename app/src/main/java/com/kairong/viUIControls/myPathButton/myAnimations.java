@@ -10,8 +10,10 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
@@ -155,38 +157,6 @@ public class myAnimations {
 			yOri = -1;
 		}
 	}
-//	private class AnimListener implements AnimatorListener {
-//
-//		private View target;
-//
-//		public AnimListener(View _target) {
-//			target = _target;
-//		}
-//
-//		@Override
-//		public void onAnimationStart(Animator animation) {
-//
-//		}
-//
-//		@Override
-//		public void onAnimationEnd(Animator animation) {
-//			if (!isOpen) {
-//				target.setVisibility(View.INVISIBLE);
-//			}
-//		}
-//
-//		@Override
-//		public void onAnimationCancel(Animator animation) {
-//			// TODO Auto-generated method stub
-//
-//		}
-//
-//		@Override
-//		public void onAnimationRepeat(Animator animation) {
-//			// TODO Auto-generated method stub
-//
-//		}
-//	}
 
 	/**
 	 * 弹几个按钮出来
@@ -213,7 +183,11 @@ public class myAnimations {
 			Log.d(TAG,"composerBtnRect left:"+composerBtnRect.left);
 
 			/**Created by Kairong Wang,2015.05.29*/
-			Animation animation = new TranslateAnimation(0,deltaX,0,deltaY);
+			TranslateAnimation translateAnimation = new TranslateAnimation(0,deltaX,0,deltaY);
+			AlphaAnimation alphaAnimation = new AlphaAnimation(0,1);
+			AnimationSet animation = new AnimationSet(true);
+			animation.addAnimation(translateAnimation);
+			animation.addAnimation(alphaAnimation);
 			animation.setFillAfter(true);
 			animation.setDuration(durationMillis);
 			animation.setStartOffset((int) ((i * 100) / (-1 + clayout.getChildCount())));
@@ -277,7 +251,11 @@ public class myAnimations {
 			}
 			Log.d(TAG,"composerBtnRect left:"+composerBtnRect.left);
 			/**Created by Kairong Wang,2015.05.29*/
-			Animation animation = new TranslateAnimation((int)deltaX,0,(int)deltaY,0);
+			TranslateAnimation translateAnimation = new TranslateAnimation((int)deltaX,0,(int)deltaY,0);
+			AlphaAnimation alphaAnimation = new AlphaAnimation(1,0);
+			AnimationSet animation = new AnimationSet(true);
+			animation.addAnimation(translateAnimation);
+			animation.addAnimation(alphaAnimation);
 			animation.setFillAfter(true);
 			animation.setDuration(durationMillis);
 			animation.setStartOffset((int) ((clayout.getChildCount() - i) * 100 / (-1 + clayout.getChildCount())));

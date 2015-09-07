@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <PreferenceCategory android:title="图片">
+        <com.kairong.viUIControls.viPreferences.viSeekBarPreference
+            android:dialogMessage="@string/picQual_dialogMsg1"
+            android:key="@string/pic_quality_key"
+            android:title="@string/picQual_title"
+            android:summary=""
+            />
+        <com.kairong.viUIControls.viPreferences.viListPreference
+            android:title="@string/defCam_title"
+            android:key="@string/def_cam_key"
+            android:summary=""
+            android:entries="@array/default_camera_entries"
+            android:entryValues="@array/default_camera_entrie_value"
+            android:dialogTitle="@string/defCam_dialogTitle"
+            android:defaultValue="1"
+            />
+    </PreferenceCategory>
+
+</PreferenceScreen>

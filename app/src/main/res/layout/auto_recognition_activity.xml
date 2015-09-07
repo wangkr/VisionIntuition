@@ -1,19 +1,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:circleprogress="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3C3C3C"
+    android:background="#555A5C"
     tools:context=".AutoRecgActivity">
     <RelativeLayout
         android:id="@+id/auto_title_bar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="@dimen/auto_title_bar_height"
         android:background="@color/layout_bar_color"
         android:paddingLeft="@dimen/layout_bar_hPadding"
         android:paddingRight="@dimen/layout_bar_hPadding"
         android:gravity="center_vertical">
         <TextView
+            android:id="@+id/btn_re_take_photo"
             android:layout_width="@dimen/auto_top_bar_btn_width"
             android:layout_height="@dimen/auto_top_bar_btn_height"
             android:text="@string/re_take_photo"
@@ -23,6 +23,7 @@
             android:background="@drawable/btn_bg"
             />
         <TextView
+            android:id="@+id/btn_auto_save"
             android:layout_width="@dimen/auto_top_bar_btn_width"
             android:layout_height="@dimen/auto_top_bar_btn_height"
             android:layout_alignParentRight="true"
@@ -32,15 +33,27 @@
             android:gravity="center"
             android:textSize="@dimen/photo_preview_ok_btnTextSize"
             android:background="@drawable/btn_bg"/>
-
-
     </RelativeLayout>
-
+    <FrameLayout
+        android:id="@+id/gpu_image_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/auto_title_bar"
+        android:background="#ffffff"
+        android:gravity="center">
+        <com.kairong.gpuimage.GPUImageView
+            android:id="@+id/auto_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
+    </FrameLayout>
     <TabHost
         android:id="@+id/tabhost"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/auto_tabhost_height"
+        android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
+        android:layout_below="@id/auto_title_bar"
         android:isScrollContainer="true"
         android:fadingEdge="vertical"
         android:background="@color/layout_bar_color"
@@ -48,9 +61,8 @@
         <TabWidget
             android:id="@android:id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/tabwidget_height">
-
-        </TabWidget>
+            android:layout_height="@dimen/tabwidget_height"
+            android:background="@color/activity_background_color"/>
 
         <FrameLayout
             android:id="@android:id/tabcontent"
@@ -61,13 +73,47 @@
                 android:id="@+id/tab1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/tab2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
+                <LinearLayout
+                    android:id="@+id/seek_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#2196F3"
+                    >
+                    <SeekBar
+                        android:id="@+id/auto_seek_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:progressDrawable="@drawable/vi_bg_bar"
+                        android:thumb="@drawable/vi_thumb_bar"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginStart="@dimen/layout_bar_vPadding"
+                        android:layout_marginEnd="@dimen/layout_bar_vPadding"
+                        android:max="100"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_below="@id/seek_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="top"
+                    >
+                    <GridView
+                        android:id="@+id/grid_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/activity_horizontal_margin"
+                        android:verticalSpacing="10dp"
+                        android:horizontalSpacing="10dp"
+                        android:columnWidth="60dp"
+                        android:numColumns="5"
+                        />
+                </LinearLayout>
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/tab3"
@@ -78,15 +124,4 @@
         </FrameLayout>
 
     </TabHost>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/tabhost"
-        android:layout_below="@id/auto_title_bar"
-        android:gravity="center">
-        <ImageView
-            android:id="@+id/auto_image_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </RelativeLayout>
 </RelativeLayout>

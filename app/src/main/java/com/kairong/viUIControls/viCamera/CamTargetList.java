@@ -18,7 +18,7 @@ public class CamTargetList {
     public static void addTargetClass(Class cls,String tag)
     {
         if(cmTargetClassList == null){
-            cmTargetClassList = new ArrayList<CmTargetClass>();
+            cmTargetClassList = new ArrayList<>();
         }
         CmTargetClass cmTargetClass = new CmTargetClass(cls,tag);
         cmTargetClassList.add(cmTargetClass);

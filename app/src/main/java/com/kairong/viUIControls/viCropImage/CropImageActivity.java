@@ -5,9 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -62,6 +60,7 @@ public class CropImageActivity extends Activity{
     private LinearLayout crop_wh_ratio_btn_ll = null;   // 裁剪宽高比按钮布局
     private ProgressDialog progressDialog = null;       // 加载进程对话框
     private String[] vlist_text = null;                 // 裁剪选项列表文字描述
+    private Intent recievedInt = null;                  // 接受到的Intent
     private int[] vlist_image = null;                   // 裁剪选项列表图标id
 
     private float crop_wh_ratio;
@@ -102,8 +101,9 @@ public class CropImageActivity extends Activity{
         crop_wh_ratio_drop_down_listView.setAdapter(crop_wh_adapter);
         crop_wh_ratio_drop_down_listView.setOnItemClickListener(onItemClickListener);
 
-        cameraRequest = (CameraRequest)getIntent().getSerializableExtra("cameraRequest");
-        bitmapIntent = (BitmapIntent)getIntent().getSerializableExtra("bitmapIntent");
+        recievedInt = getIntent();
+        cameraRequest = (CameraRequest)recievedInt.getSerializableExtra("cameraRequest");
+        bitmapIntent = (BitmapIntent)recievedInt.getSerializableExtra("bitmapIntent");
         showMaxWidth = viApplication.getViApp().getScreenWidth();
         showMaxHeight = viApplication.getViApp().getScreenHeight()-2*getResources().getDimensionPixelSize(R.dimen.layout_bar_height);
 
@@ -238,7 +238,7 @@ public class CropImageActivity extends Activity{
         float srcWHratio = (float)srcWidth/srcHeight;
         // 设置固定宽高比值
         if(cameraRequest.getCropType()!= CropPhotoType.CROP_FREE_RATIO) {
-            cropImageView.setIfFixedWHratio(true);
+            cropImageView.fixWHratio(true);
             crop_wh_ratio = cameraRequest.getDefaultCropWHratioValue();
             // 设置裁剪宽高
             if(crop_wh_ratio>=srcWHratio){
@@ -272,8 +272,8 @@ public class CropImageActivity extends Activity{
         if(cameraRequest.getCropType()!=CropPhotoType.CROP_FREE_RATIO){
             String text = cameraRequest.getDefaultCropWHratioString();
             crop_wh_ratio_text.setText(text);
-            // 定比模式
             if(cameraRequest.getCropType()==CropPhotoType.CROP_FIXED_RATIO){
+                // 定比模式
                 int Idx = 0;
                 for(String s:WH_RATIO_TEXT_COMM){
                     if(s.contains(text))break;
@@ -283,7 +283,8 @@ public class CropImageActivity extends Activity{
                     vlist_image = new int[]{WH_RATIO_IMAGE_COMM[Idx]};
                     vlist_text = new String[]{text};
                 }
-            } else if (cameraRequest.getCropType() == CropPhotoType.CROP_MULTI_RATIO) {// 多比例模式
+            } else if (cameraRequest.getCropType() == CropPhotoType.CROP_MULTI_RATIO) {
+                // 多比例模式
                 vlist_text = cameraRequest.getCrop_wh_options();
                 int itemNum = vlist_text.length;
                 vlist_image = new int[itemNum];
@@ -301,7 +302,8 @@ public class CropImageActivity extends Activity{
             crop_wh_adapter = new SimpleAdapter(this,getData(vlist_image,vlist_text),R.layout.crop_wh_ratio_vlist,
                     new String[] {"vlist_image","vlist_text"},new int[] {R.id.vlist_image,R.id.vlist_text});
             crop_wh_ratio_drop_down_listView.setAdapter(crop_wh_adapter);
-        } else {// 自由比例模式
+        } else {
+            // 自由比例模式
             crop_wh_ratio_text.setText("自由比例");
             crop_wh_ratio_text.setTextColor(Color.rgb(128, 128, 128));
             crop_wh_ratio_btn_ll.setClickable(false);
@@ -331,15 +333,12 @@ public class CropImageActivity extends Activity{
                     Thread.sleep(10);
                     // 跳转到其他的Activity
                     if (cameraRequest.backOriginClass()) {
-                        Intent newint = new Intent(CropImageActivity.this, cameraRequest.getOriginClass());
-                        newint.putExtra("imagepath", filepath);
-                        setResult(RESULT_OK, newint);
-                        finish();
+                        recievedInt.putExtra("imagepath", filepath);
+                        CropImageActivity.this.setResult(RESULT_OK, recievedInt);
                     } else if (cameraRequest.goDestClass()) {
                         Intent newint = new Intent(CropImageActivity.this, cameraRequest.getDestClass());
                         newint.putExtra("imagepath", filepath);
-                        startActivity(newint);
-                        finish();
+                        CropImageActivity.this.startActivity(newint);
                     }
                     if (saved_photo != null)//回收bitmap空间
                         saved_photo.recycle();
@@ -348,12 +347,15 @@ public class CropImageActivity extends Activity{
                     saved_photo = null;
                     recievedPhoto = null;
                     System.gc();
+                    CropImageActivity.this.finish();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "文件没有找到", Toast.LENGTH_SHORT).show();
+                    CropImageActivity.this.setResult(RESULT_CANCELED, recievedInt);
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "图片保存发生错误", Toast.LENGTH_SHORT).show();
+                    CropImageActivity.this.setResult(RESULT_CANCELED, recievedInt);
                 } catch (InterruptedException e){
                     e.printStackTrace();
                 }
@@ -386,8 +388,6 @@ public class CropImageActivity extends Activity{
                 saved_photo.recycle();
             if(recievedPhoto!=null)
                 recievedPhoto.recycle();
-            saved_photo = null;
-            recievedPhoto = null;
             System.gc();
         }
     }

@@ -1,0 +1,17 @@
+<resources>
+    <string name="title_activity_settings">设置</string>
+    <string name="pic_quality_key">pref_picQua</string>
+    <string name="def_cam_key">pref_defCam</string>
+    <string name="picQual_dialogMsg1">设置拍照的图片分辨率</string>
+    <string name="picQual_title">图片质量</string>
+    <string name="defCam_dialogTitle">选择默认摄像头</string>
+    <string name="defCam_title">默认摄像头</string>
+    <string-array name="default_camera_entries">
+        <item>前置</item>
+        <item>后置</item>
+    </string-array>
+    <string-array name="default_camera_entrie_value">
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+</resources>

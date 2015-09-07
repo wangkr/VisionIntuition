@@ -39,7 +39,7 @@ public class viAlertDialog extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.vi_alertdialog_activity);
+        setContentView(R.layout.vi_dialog_xml);
         RelativeLayout cancell_button = (RelativeLayout)findViewById(R.id.aldl_clbtn_layout);
         ((TextView)findViewById(R.id.alertTitle)).setText(titleString);
         cancell_button.setOnClickListener(new View.OnClickListener() {

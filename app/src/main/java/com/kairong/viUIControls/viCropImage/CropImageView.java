@@ -97,7 +97,7 @@ public class CropImageView extends View {
         mFloatDrawable = new FloatDrawable(context);
     }
 
-    public void setIfFixedWHratio(boolean ifFixedWHratio){
+    public void fixWHratio(boolean ifFixedWHratio){
         this.ifFixedWHratio = ifFixedWHratio;
     }
 

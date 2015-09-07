@@ -22,4 +22,8 @@
     <string name="done_text">完 成</string>
     <string name="re_take_photo">重 拍</string>
     <string name="save_photo">保 存</string>
+    <string name="super_high">超高</string>
+    <string name="high">高</string>
+    <string name="medium">中</string>
+    <string name="low">低</string>
 </resources>

@@ -12,6 +12,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -34,7 +38,7 @@ import com.kairong.viUtils.BitmapUtil;
  * blog:http://blog.csdn.net/wangkr111
  */
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener{
     private viApplication app = null;
 
     private ImageView composerButtonShowHideButtonIcon = null;
@@ -42,7 +46,7 @@ public class MainActivity extends Activity {
     private static final int REQUEST_CODE_PICK_IMAGE = 3022;
     private myAnimations myanimation = null;
     private String[] ratio_opt = new String[]{"16:9","4:3","3:2"};
-    private CameraRequest cameraRequest = new CameraRequest(CropPhotoType.CROP_FIXED_RATIO, TakePhotoMode.LANDSCAPE_MODE,"16:9", null,
+    private CameraRequest cameraRequest = new CameraRequest(CropPhotoType.CROP_MULTI_RATIO, TakePhotoMode.LANDSCAPE_MODE,null, null,
             CamTargetList.getTargetClass("AutoRecgActivity"),ratio_opt);
     private String TAG = "MainActivity";
 
@@ -54,41 +58,18 @@ public class MainActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
-        CircleButton btn_camera = (CircleButton)findViewById(R.id.btn_camera);
-        CircleButton btn_gallery = (CircleButton)findViewById(R.id.btn_gallery);
-        ImageView btn_face_match = (ImageView)findViewById(R.id.btn_composer_face_match);
-        ImageView btn_age_test = (ImageView)findViewById(R.id.btn_composer_age_test);
-        ImageView btn_text_conversion = (ImageView)findViewById(R.id.btn_composer_text_conversion);
         ImageView composerButtonShowHideButton = (ImageView)findViewById(R.id.btn_composer_button);
         TextView title_text = (TextView)findViewById(R.id.text_title);
         TextView title_text_bk = (TextView)findViewById(R.id.text_title_background);
         RelativeLayout composerButtonWrapper = (RelativeLayout)findViewById(R.id.composer_wrapper_layout);
         composerButtonShowHideButtonIcon = (ImageView)findViewById(R.id.btn_composer_button_icon);
 
+        startButtonAnimation();
+
         Typeface typeface = Typeface.createFromAsset(getAssets(),"fonts/SNAP ITC.TTF");
         title_text.setTypeface(typeface);
         title_text_bk.setTypeface(typeface);
-        btn_face_match.setOnClickListener(cpBtnListener);
-        btn_age_test.setOnClickListener(cpBtnListener);
-        btn_text_conversion.setOnClickListener(cpBtnListener);
-        btn_camera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("cameraRequest",cameraRequest);
-                Intent intent = new Intent(MainActivity.this,viCameraActivity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        });
-        btn_gallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
-            }
-        });
+
         int radius = Math.round(viApplication.getViApp().getScreenWidth()*1.0f/3);
         myanimation = new myAnimations(app,composerButtonWrapper,myAnimations.CENTERTOP,radius,30,120);
         composerButtonShowHideButton.setOnClickListener(new View.OnClickListener() {
@@ -106,26 +87,82 @@ public class MainActivity extends Activity {
         Log.d(TAG, "OnCreate success!");
     }
 
-    private View.OnClickListener cpBtnListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId())
-            {
-                case R.id.btn_composer_face_match:
-                    Intent intent = new Intent(MainActivity.this,FaceMatActivity.class);
-                    startActivity(intent);
-                    break;
-                case R.id.btn_composer_age_test:
-                    Intent intent2 = new Intent(MainActivity.this,AgeTestActivity.class);
-                    startActivity(intent2);
-                    break;
-                case R.id.btn_composer_text_conversion:
-                    Intent intent3 = new Intent(MainActivity.this,TextCovtActivity.class);
-                    startActivity(intent3);
-                    break;
+    private void startButtonAnimation(){
+        final CircleButton camera = (CircleButton)findViewById(R.id.btn_camera);
+        final CircleButton gallery = (CircleButton)findViewById(R.id.btn_gallery);
+        final RelativeLayout composer = (RelativeLayout)findViewById(R.id.composer_btn_layout);
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0,1);
+        ScaleAnimation scaleAnimation = new ScaleAnimation(0.5f,1f,0.5f,1f,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+        AnimationSet animationSet = new AnimationSet(true);
+        animationSet.addAnimation(alphaAnimation);
+        animationSet.addAnimation(scaleAnimation);
+        animationSet.setDuration(800);
+        alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
             }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                camera.clearAnimation();
+                gallery.clearAnimation();
+                composer.clearAnimation();
+                composer.setVisibility(View.VISIBLE);
+                gallery.setVisibility(View.VISIBLE);
+                camera.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        camera.startAnimation(animationSet);
+        gallery.startAnimation(animationSet);
+        composer.startAnimation(animationSet);
+    }
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+            case R.id.btn_camera:
+                openCamera();
+                break;
+            case R.id.btn_gallery:
+                openGallery();
+                break;
+            case R.id.btn_composer_face_match:
+                Intent intent = new Intent(MainActivity.this,FaceMatActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_composer_age_test:
+                Intent intent2 = new Intent(MainActivity.this,AgeTestActivity.class);
+                startActivity(intent2);
+                break;
+            case R.id.btn_composer_text_conversion:
+                Intent intent3 = new Intent(MainActivity.this,TextCovtActivity.class);
+                startActivity(intent3);
+                break;
+            case R.id.btn_composer_setting:
+                Intent intent4 = new Intent(MainActivity.this,SettingsActivity.class);
+                startActivity(intent4);
+                break;
         }
-    };
+    }
+    private void openCamera(){
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("cameraRequest",cameraRequest);
+        Intent intent = new Intent(MainActivity.this,viCameraActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+    private void openGallery(){
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -204,4 +241,9 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.gc();
+    }
 }

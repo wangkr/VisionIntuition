@@ -395,9 +395,16 @@ public final class BitmapUtil {
             float scale = (float)size.getHeight()/sampleBit.getHeight();
             Matrix m = new Matrix();
             m.setScale(scale,scale);
-            return Bitmap.createBitmap(sampleBit,0,0,sampleBit.getWidth(),sampleBit.getHeight(),m,true);
+            sampleBit = Bitmap.createBitmap(sampleBit,0,0,sampleBit.getWidth(),sampleBit.getHeight(),m,true);
         }
-        return BitmapFactory.decodeFile(filepath, options);
+        // 出现sample Bitmap高大于request高的情况
+        if(sampleBit.getWidth()>size.getWidth()){
+            float scale = (float)size.getWidth()/sampleBit.getWidth();
+            Matrix m = new Matrix();
+            m.setScale(scale,scale);
+            sampleBit = Bitmap.createBitmap(sampleBit,0,0,sampleBit.getWidth(),sampleBit.getHeight(),m,true);
+        }
+        return sampleBit;
     }
 
     /**

@@ -1,19 +1,19 @@
 <resources>
 
-     Base application theme.
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+     <!--Base application theme.-->
+    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="viAlertDialog" parent="@android:Theme.Dialog">
+    <style name="viAlertDialog" parent="@android:style/Theme.Holo.Light.Dialog.NoActionBar.MinWidth">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@drawable/vi_alertdialog_bk</item>
+        <item name="android:windowBackground">@drawable/vi_dialog_bk</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style parent="@android:Theme.Dialog" name="viHintDialog">
+    <style parent="@android:style/Theme.Holo.DialogWhenLarge" name="viHintDialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

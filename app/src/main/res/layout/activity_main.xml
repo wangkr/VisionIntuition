@@ -42,7 +42,7 @@
         <!--android:layout_centerHorizontal="true"-->
         <!--android:background="@mipmap/octopus_main" />-->
     <!-- 打开图片按钮布局-->
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="@dimen/open_pic_layout_width"
         android:layout_height="@dimen/main_1_btn_size"
         android:layout_centerVertical="true"
@@ -53,23 +53,23 @@
             android:layout_width="@dimen/main_1_btn_size"
             android:layout_height="@dimen/main_1_btn_size"
             android:id="@+id/btn_camera"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            circlebutton:cb_color="@color/camer_open_button_color"
             android:src="@mipmap/alert_cmbtn_icn"
+            android:onClick="onClick"
+            circlebutton:cb_color="@color/camer_open_button_color"
             circlebutton:cb_pressedRingWidth="@dimen/main_1_cb_pressedRingWidth"
+            android:visibility="invisible"
             />
         <com.kairong.viUIControls.circleButton.CircleButton
             android:layout_width="@dimen/main_1_btn_size"
             android:layout_height="@dimen/main_1_btn_size"
             android:id="@+id/btn_gallery"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            circlebutton:cb_color="@color/gallery_open_button_color"
+            android:onClick="onClick"
             android:src="@mipmap/alert_glbtn_icn"
+            circlebutton:cb_color="@color/gallery_open_button_color"
             circlebutton:cb_pressedRingWidth="@dimen/main_1_cb_pressedRingWidth"
+            android:visibility="invisible"
             />
-        </RelativeLayout>
+        </LinearLayout>
     <!-- 组合按钮子按钮布局-->
     <RelativeLayout
         android:id="@+id/composer_wrapper_layout"
@@ -83,6 +83,7 @@
             android:layout_height="@dimen/main_2_btn_size"
             android:layout_centerHorizontal="true"
             android:src="@mipmap/setting_button_icn"
+            android:onClick="onClick"
             circlebutton:cb_color="@color/comp_child_buttons_color"
             android:visibility="invisible"/>
         <com.kairong.viUIControls.circleButton.CircleButton
@@ -91,6 +92,7 @@
             android:layout_height="@dimen/main_2_btn_size"
             android:layout_centerHorizontal="true"
             android:src="@mipmap/text_convertion_button_icn"
+            android:onClick="onClick"
             circlebutton:cb_color="@color/comp_child_buttons_color"
             android:visibility="invisible"/>
         <com.kairong.viUIControls.circleButton.CircleButton
@@ -99,6 +101,7 @@
             android:layout_height="@dimen/main_2_btn_size"
             android:layout_centerHorizontal="true"
             android:src="@mipmap/age_test_button_icn"
+            android:onClick="onClick"
             circlebutton:cb_color="@color/comp_child_buttons_color"
             android:visibility="invisible"/>
         <com.kairong.viUIControls.circleButton.CircleButton
@@ -107,22 +110,26 @@
             android:layout_height="@dimen/main_2_btn_size"
             android:layout_centerHorizontal="true"
             android:src="@mipmap/face_match_button_icn"
+            android:onClick="onClick"
             circlebutton:cb_color="@color/comp_child_buttons_color"
             android:visibility="invisible"/>
     </RelativeLayout>
     <!-- 组合按钮父按钮布局-->
     <RelativeLayout
+        android:id="@+id/composer_btn_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/open_pic_layout"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible">
         <com.kairong.viUIControls.circleButton.CircleButton
             android:id="@+id/btn_composer_button"
-            android:layout_width="@dimen/main_2_btn_size"
-            android:layout_height="@dimen/main_2_btn_size"
+            android:layout_width="@dimen/main_3_btn_size"
+            android:layout_height="@dimen/main_3_btn_size"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             circlebutton:cb_color="@color/comp_button_color"
+            circlebutton:cb_pressedRingWidth="0dp"
             />
         <ImageView
             android:id="@+id/btn_composer_button_icon"

@@ -13,4 +13,7 @@
         <item>横屏</item>
         <item>竖屏</item>
     </string-array>
+    <!--<style name="viDialogPreference">-->
+        <!--<item name="dialogPreferenceStyle">@android:style/Preference.DialogPreference</item>-->
+    <!--</style>-->
 </resources>
