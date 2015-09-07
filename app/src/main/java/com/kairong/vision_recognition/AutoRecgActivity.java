@@ -188,10 +188,10 @@ public class AutoRecgActivity extends Activity implements View.OnClickListener,S
     }
     private List<Map<String,Object>> getData(){
         int[] filter_icn_id = {
-//                R.drawable.test,R.drawable.amatorka,R.drawable.brannan,R.drawable.earlybird,
-//                R.drawable.i1977, R.drawable.inkwell,R.drawable.lomo,R.drawable.lordkelvin,
-//                R.drawable.rise, R.drawable.sepia,R.drawable.sutro,R.drawable.toaster,
-//                R.drawable.tonecurve,R.drawable.valencia,R.drawable.walden,R.drawable.hefe
+                R.drawable.test,R.drawable.amatorka,R.drawable.brannan,R.drawable.earlybird,
+                R.drawable.i1977, R.drawable.inkwell,R.drawable.lomo,R.drawable.lordkelvin,
+                R.drawable.rise, R.drawable.sepia,R.drawable.sutro,R.drawable.toaster,
+                R.drawable.tonecurve,R.drawable.valencia,R.drawable.walden,R.drawable.hefe
         };
         String[] filter_icn_title={
                 "原图","Amatorka","Brannan","Earlybird","1977","Inkwell","Lomo","LordKelvin",
